@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rego-rules-nginx
+data:
+  pod-name.rego: |
+    package kubeasy.challenge
+
+    violation[{"msg": msg}] {
+      input.metadata.name != "nginx"
+      msg := "Pod name is not nginx"
+    }
+
+  pod-image.rego: |
+    package kubeasy.challenge
+
+    violation[{"msg": msg}] {
+      some i
+      input.spec.containers[i].image != "nginx:1.25"
+      msg := sprintf("Container %v image is not nginx:1.25", [i])
+    }
