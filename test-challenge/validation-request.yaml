@@ -1,5 +1,5 @@
 apiVersion: challenge.kubeasy.dev/v1alpha1
-kind: ValidationRequest
+kind: StaticValidation
 metadata:
   name: validate-pod-nginx
 spec:
