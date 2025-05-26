@@ -1,0 +1,19 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: DynamicValidation
+metadata:
+  labels:
+    app.kubernetes.io/name: challenge-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: dynamicvalidation-sample
+spec:
+  target:
+    apiVersion: v1
+    kind: Pod
+    labelSelector:
+      matchLabels:
+        app: nginx
+  checks:
+    - kind: status
+      statusCheck:
+        condition: "Ready"
+        expectedStatus: "True"
