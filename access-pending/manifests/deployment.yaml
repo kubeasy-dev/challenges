@@ -18,6 +18,11 @@ spec:
           image: ghcr.io/kubeasy-dev/access-pending:latest
           ports:
             - containerPort: 8080
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
           startupProbe:
             httpGet:
               path: /startupz

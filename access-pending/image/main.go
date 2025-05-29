@@ -30,9 +30,10 @@ func main() {
 	http.HandleFunc("/startupz", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("⏳ Startup probe hit, checking permissions...")
 
-		_, err := clientset.CoreV1().Pods("").List(context.Background(), metav1.ListOptions{Limit: 1})
+		namespace := os.Getenv("POD_NAMESPACE")
+		_, err := clientset.CoreV1().Pods(namespace).List(context.Background(), metav1.ListOptions{Limit: 1})
 		if err != nil {
-			log.Printf("❌ Access denied: %v", err)
+			log.Printf("❌ Access denied in namespace %s: %v", namespace, err)
 			http.Error(w, "forbidden", http.StatusInternalServerError)
 			return
 		}
