@@ -35,11 +35,3 @@ spec:
                 containers:
                   - name: "*"
                     image: "kubeasy/startup-check:v1"
-
-    - name: block-clusterrole
-      match:
-        resources:
-          kinds: ["ClusterRole", "ClusterRoleBinding"]
-      validate:
-        message: "Cluster-level permissions are not allowed in this challenge"
-        deny: {}
