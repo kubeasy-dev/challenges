@@ -1,0 +1,16 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: DynamicValidation
+metadata:
+  name: pod
+spec:
+  target:
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    name: startup-check-role
+  checks:
+    - kind: rbac
+      rbacCheck:
+        serviceAccountName: startup-checker
+        resourceAttributes:
+        - verb: list
+          resource: pods

@@ -1,0 +1,45 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: restrict-modifications
+spec:
+  validationFailureAction: enforce
+  background: true
+  rules:
+    - name: must-have-startup-probe
+      match:
+        resources:
+          kinds: ["Deployment"]
+      validate:
+        message: "Containers must have a startupProbe on /startupz"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: "*"
+                    startupProbe:
+                      httpGet:
+                        path: "/startupz"
+
+    - name: only-allowed-image
+      match:
+        resources:
+          kinds: ["Deployment"]
+      validate:
+        message: "Only kubeasy/startup-check:v1 is allowed"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: "*"
+                    image: "kubeasy/startup-check:v1"
+
+    - name: block-clusterrole
+      match:
+        resources:
+          kinds: ["ClusterRole", "ClusterRoleBinding"]
+      validate:
+        message: "Cluster-level permissions are not allowed in this challenge"
+        deny: {}

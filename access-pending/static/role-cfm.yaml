@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rego-rules-role
+data:
+  require-list-verb.rego: |
+    package kubeasy.challenge
+
+    violation[{"msg": msg}] {
+      input.kind == "Role"
+      some i
+      input.rules[i].resources[_] == "pods"
+      not verbs_contain(input.rules[i].verbs, "list")
+      msg := "The role must include the 'list' verb on pods"
+    }
+
+    verbs_contain(verbs, verb) {
+      some i
+      verbs[i] == verb
+    }

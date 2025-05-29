@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: startup-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: startup-app
+  template:
+    metadata:
+      labels:
+        app: startup-app
+    spec:
+      serviceAccountName: startup-checker
+      containers:
+        - name: app
+          image: ghrc.io/kubeasy-dev/access-pending:latest
+          ports:
+            - containerPort: 8080
+          startupProbe:
+            httpGet:
+              path: /startupz
+              port: 8080
+            failureThreshold: 3
+            periodSeconds: 5

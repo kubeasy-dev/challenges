@@ -1,0 +1,15 @@
+title: "Access Pending"
+description: |
+  The app was deployed, the image looks fine, but nothing starts. 
+  Dig into what happens before the first log line ever appears.
+theme: "rbac"
+difficulty: "advanced"
+estimated_time: 15
+initial_situation: | 
+  A recent deployment was pushed using the usual CI process, with a custom image and a startup probe.  
+  The application doesn't seem to be running as expected.  
+  You're now responsible for diagnosing and unlocking the situation — but without modifying the image or bypassing any critical settings.
+objective: |
+  Ensure the application starts correctly and that the Pod becomes Ready.
+  Something is blocking the startup sequence — your job is to identify the root cause
+  and adjust the current configuration so the rollout can complete successfully.
