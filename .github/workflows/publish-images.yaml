@@ -12,10 +12,6 @@ permissions:
   packages: write
   contents: read
 
-env:
-  IMAGE_ROOT: ghcr.io/kubeasy-dev/
-  PLATFORMS: linux/amd64,linux/arm64
-
 jobs:
   images:
     runs-on: ubuntu-latest
@@ -31,7 +27,7 @@ jobs:
         id: get_images
         run: |
           echo images=$(find . -type d -name "image" -exec dirname {} \; | sed 's|^\./||g' | jq -R . | jq -sc .) >> "$GITHUB_OUTPUT"
-          
+
       - name: Debug
         run: |
           echo "Images found: ${{ steps.get_images.outputs.images }}"
@@ -57,24 +53,19 @@ jobs:
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
-        with:
-          platforms: ${{ env.PLATFORMS }}
 
       - name: Docker Setup Buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          driver-opts: |
-            image=moby/buildkit:master
-            network=host
-          platforms: ${{ env.PLATFORMS }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
-          platforms: ${{ env.PLATFORMS }}
+          platforms: |
+            linux/amd64
+            linux/arm64
           context: ${{ matrix.image }}/image
           file: ${{ matrix.image }}/image/Dockerfile
           push: true
-          tags: ${{ env.IMAGE_ROOT }}${{ matrix.image }}/latest
+          tags: ghcr.io/kubeasy-dev/${{ matrix.image }}/latest
           cache-from: type=gha
           cache-to: type=gha, mode=max
