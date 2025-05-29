@@ -1,7 +1,7 @@
 apiVersion: challenge.kubeasy.dev/v1alpha1
 kind: DynamicValidation
 metadata:
-  name: pod
+  name: pod-validation
 spec:
   target:
     apiVersion: v1
