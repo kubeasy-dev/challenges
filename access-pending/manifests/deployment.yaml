@@ -15,7 +15,7 @@ spec:
       serviceAccountName: startup-checker
       containers:
         - name: app
-          image: ghrc.io/kubeasy-dev/access-pending:latest
+          image: ghrc.io/kubeasy-dev/challenges/access-pending:latest
           ports:
             - containerPort: 8080
           startupProbe:
@@ -24,3 +24,11 @@ spec:
               port: 8080
             failureThreshold: 3
             periodSeconds: 5
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+          pullPolicy: Always

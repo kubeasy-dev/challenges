@@ -66,6 +66,6 @@ jobs:
           context: ${{ matrix.image }}/image
           file: ${{ matrix.image }}/image/Dockerfile
           push: true
-          tags: ghcr.io/kubeasy-dev/${{ matrix.image }}/latest
+          tags: ghcr.io/kubeasy-dev/challenges/${{ matrix.image }}:latest
           cache-from: type=gha
           cache-to: type=gha, mode=max
