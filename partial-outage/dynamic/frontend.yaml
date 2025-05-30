@@ -16,5 +16,5 @@ spec:
         expectedStatus: "True"
     - kind: logs
       logCheck:
-        container: startup-app
+        container: frontend
         expectedString: "✅ Connected to backend"
