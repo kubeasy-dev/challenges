@@ -11,6 +11,6 @@ spec:
         - key: validate
           operator: NotIn
           values:
-            - false
+            - "false"
   rulesConfigMap:
     name: rego-rules-partial-outage
