@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: ghcr.io/kubeasy/partial-outage:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: BACKEND_HOST
+              value: http://backend
+          pullPolicy: Always

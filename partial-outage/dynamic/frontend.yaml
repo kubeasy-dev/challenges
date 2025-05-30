@@ -1,0 +1,20 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: DynamicValidation
+metadata:
+  name: pod-validation
+spec:
+  targetRef:
+    apiVersion: v1
+    kind: Pod
+    labelSelector:
+      matchLabels:
+        app: frontend
+  checks:
+    - kind: status
+      statusCheck:
+        condition: "Ready"
+        expectedStatus: "True"
+    - kind: logs
+      logCheck:
+        containerName: startup-app
+        expectedString: "✅ Connected to backend"

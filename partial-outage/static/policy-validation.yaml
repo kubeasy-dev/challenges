@@ -1,0 +1,11 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: StaticValidation
+metadata:
+  name: validate-role
+spec:
+  targetRef:
+    apiVersion: networking.k8s.io/v1
+    kind: NetworkPolicy
+    name: allow-frontend-to-backend
+  rulesConfigMap:
+    name: rego-rules-partial-outage

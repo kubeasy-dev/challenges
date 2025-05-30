@@ -1,0 +1,20 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: protect-app-labels
+spec:
+  rules:
+    - name: block-label-change
+      match:
+        resources:
+          kinds: ["Pod", "Deployment"]
+      validate:
+        message: "Do not change app labels"
+        deny:
+          conditions:
+            - key: "{{ request.operation }}"
+              operator: Equals
+              value: UPDATE
+            - key: "{{ request.object.metadata.labels.app }}"
+              operator: NotEquals
+              value: "{{ request.oldObject.metadata.labels.app }}"

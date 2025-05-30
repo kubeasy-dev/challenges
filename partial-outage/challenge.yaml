@@ -1,0 +1,10 @@
+title: Partial Outage
+description: The frontend app is up — but some users report failures. It’s not the code.
+  Investigate the cluster’s configuration before the incident spreads.
+theme: networking
+difficulty: beginner
+estimated_time: 10
+initial_situation: |
+  A frontend Deployment with 2 replicas and a backend Deployment with 1 replica are deployed in the same namespace.
+  A NetworkPolicy is defined, but users still report issues — possibly related to intra-cluster communication.
+objective: Ensure the frontend can successfully communicate with the backend over HTTP, while keeping traffic restricted.

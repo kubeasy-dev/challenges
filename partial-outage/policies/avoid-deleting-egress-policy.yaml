@@ -1,0 +1,14 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: avoid-deny-delete-networkpolicy
+spec:
+  rules:
+    - name: block-delete-deny-all
+      match:
+        resources:
+          kinds: ["NetworkPolicy"]
+          names: ["deny-all"]
+      validate:
+        message: "You are not allowed to delete the default NetworkPolicy"
+        deny: {}
