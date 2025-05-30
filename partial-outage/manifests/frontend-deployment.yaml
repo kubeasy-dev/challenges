@@ -20,4 +20,17 @@ spec:
           env:
             - name: BACKEND_HOST
               value: http://backend
+          resources:
+            requests:
+              cpu: "20m"
+              memory: "128Mi"
+            limits:
+              cpu: "50m"
+              memory: "256Mi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 3
           imagePullPolicy: Always

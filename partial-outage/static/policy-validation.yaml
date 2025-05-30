@@ -6,6 +6,11 @@ spec:
   target:
     apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
-    name: allow-frontend-to-backend
+    labelSelector:
+      matchExpressions:
+        - key: validate
+          operator: NotIn
+          values:
+            - false
   rulesConfigMap:
     name: rego-rules-partial-outage

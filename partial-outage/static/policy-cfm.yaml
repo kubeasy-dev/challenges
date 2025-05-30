@@ -7,8 +7,6 @@ data:
     package kubeasy.challenge
 
     violation[{"msg": msg}] {
-        input.kind == "NetworkPolicy"
-        input.metadata.name != "deny-all"
         not allows_frontend_to_backend(input)
         msg := "You must allow pods with label app=frontend to access pods with app=backend on port 5678"
       }
