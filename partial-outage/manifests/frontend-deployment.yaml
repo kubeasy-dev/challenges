@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ghcr.io/kubeasy/partial-outage:latest
+          image: ghcr.io/kubeasy-dev/partial-outage:latest
           ports:
             - containerPort: 80
           env:
