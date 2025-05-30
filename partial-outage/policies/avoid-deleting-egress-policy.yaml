@@ -3,6 +3,7 @@ kind: Policy
 metadata:
   name: avoid-deny-delete-networkpolicy
 spec:
+  validationFailureAction: enforce
   rules:
     - name: block-delete-deny-all
       match:
