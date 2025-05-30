@@ -3,7 +3,7 @@ kind: StaticValidation
 metadata:
   name: validate-role
 spec:
-  targetRef:
+  target:
     apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
     name: allow-frontend-to-backend

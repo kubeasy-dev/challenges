@@ -3,7 +3,7 @@ kind: DynamicValidation
 metadata:
   name: pod-validation
 spec:
-  targetRef:
+  target:
     apiVersion: v1
     kind: Pod
     labelSelector:
