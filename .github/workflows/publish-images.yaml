@@ -4,7 +4,7 @@ on:
       - main
     paths:
       - '**/image/**'
-      - '.github/workflows/publish-images.yaml'
+  workflow_dispatch:
 
 name: Build and Publish Docker Images
 
@@ -16,33 +16,37 @@ jobs:
   images:
     runs-on: ubuntu-latest
     outputs:
-      images: ${{ steps.get_images.outputs.images }}
+      matrix: ${{ steps.changed-files.outputs.all_changed_files }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: "0"
-          
-      - name: Get all subdirectories wiich contains image folder
-        id: get_images
-        run: |
-          echo images=$(find . -type d -name "image" -exec dirname {} \; | sed 's|^\./||g' | jq -R . | jq -sc .) >> "$GITHUB_OUTPUT"
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v46
+        with:
+          since_last_remote_commit: true 
+          dir_names: true
+          dir_names_max_depth: 1
+          matrix: true
 
       - name: Debug
         run: |
-          echo "Images found: ${{ steps.get_images.outputs.images }}"
+          echo "Changed directories: ${{ steps.changed-files.outputs.all_changed_files }}"
 
   build-and-push:
     runs-on: ubuntu-latest
     needs: images
     strategy:
       matrix:
-        image: ${{ fromJson(needs.images.outputs.images) }} 
+        image: ${{ fromJson(needs.images.outputs.matrix) }} 
+    if: ${{ needs.images.outputs.matrix != '[]' }}
     steps: 
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-
           fetch-depth: "0"
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
