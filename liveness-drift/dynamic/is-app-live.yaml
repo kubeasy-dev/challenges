@@ -1,0 +1,16 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: DynamicValidation
+metadata:
+  name: is-app-live
+spec:
+  target:
+    apiVersion: v1
+    kind: Pod
+    labelSelector:
+      matchLabels:
+        app: notify-service
+  checks:
+    - kind: status
+      statusCheck:
+        condition: "Ready"
+        expectedStatus: "True"

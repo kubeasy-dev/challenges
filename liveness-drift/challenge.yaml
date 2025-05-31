@@ -1,0 +1,10 @@
+title: Liveness Drift
+description: The app seems fine. So why does it keep crashing?
+theme: monitoring-debugging
+difficulty: intermediate
+estimated_time: 10
+initial_situation: |
+  The team shipped a minor refactor earlier today.
+  Everything looked good — until users noticed the app was constantly restarting.
+objective: |
+  Figure out why the pod keeps crashing and fix the issue without bypassing the health checks.

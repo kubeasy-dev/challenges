@@ -1,0 +1,11 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: StaticValidation
+metadata:
+  name: check-deployment
+spec:
+  target:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: notify-service
+  rulesConfigMap:
+    name: rego-rules-role

@@ -1,0 +1,20 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: no-deletion-deployment
+spec:
+  validationFailureAction: enforce
+  rules:
+    - name: block-deletion
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["notify-service"]
+      preconditions:
+        all:
+          - key: "{{ request.operation }}"
+            operator: Equals
+            value: DELETE
+      validate:
+        message: "You are not allowed to delete the deployment"
+        deny: {}

@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: check-deployment
+data:
+  liveness-present.rego: |
+    package kubeasy.challenge
+
+    violation[{"msg": msg}] {
+      not input.spec.template.spec.containers[_].livenessProbe
+      msg := "Liveness probe is missing"
+    }
+  readiness-present.rego: |
+    package kubeasy.challenge
+
+    violation[{"msg": msg}] {
+      not input.spec.template.spec.containers[_].readinessProbe
+      msg := "Readiness probe is missing"
+    }
