@@ -7,13 +7,15 @@ data:
     package kubeasy.challenge
 
     violation[{"msg": msg}] {
-      not input.spec.template.spec.containers[_].livenessProbe
+      some i
+      not input.spec.template.spec.containers[i].livenessProbe
       msg := "Liveness probe is missing"
     }
   readiness-present.rego: |
     package kubeasy.challenge
 
     violation[{"msg": msg}] {
-      not input.spec.template.spec.containers[_].readinessProbe
+      some i
+      not input.spec.template.spec.containers[i].readinessProbe
       msg := "Readiness probe is missing"
     }
