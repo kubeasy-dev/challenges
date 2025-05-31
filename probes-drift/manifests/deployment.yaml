@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: ghcr.io/kubeasy-dev/liveness-drift:latest
+          image: ghcr.io/kubeasy-dev/probes-drift:latest
           livenessProbe:
             httpGet:
               path: /healthz
