@@ -22,10 +22,6 @@ func main() {
 		fmt.Fprintln(w, "Ready")
 	})
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Welcome to notify-service!")
-	})
-
 	http.HandleFunc("/notify", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -35,6 +31,14 @@ func main() {
 		w.WriteHeader(http.StatusAccepted)
 		fmt.Fprintln(w, "Notification accepted")
 		log.Println("Notification processed successfully")
+	})
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.Error(w, "Not found", http.StatusInternalServerError)
+			return
+		}
+		fmt.Fprintln(w, "Welcome to notify-service!")
 	})
 
 	port := ":8080"
