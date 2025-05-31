@@ -1,4 +1,4 @@
-title: Liveness Drift
+title: Probes Drift
 description: The app seems fine. So why does it keep crashing?
 theme: monitoring-debugging
 difficulty: intermediate
