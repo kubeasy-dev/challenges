@@ -9,12 +9,12 @@ import (
 
 func main() {
 	log.Println("Available routes:")
-	log.Println("  GET /health/live → Liveness probe")
+	log.Println("  GET /healthz/live → Liveness probe")
 	log.Println("  GET /healthz/ready → Readiness probe")
 	log.Println("  GET / → Welcome message")
 	log.Println("  POST /notify → Send a notification")
 
-	http.HandleFunc("/health/live", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/healthz/live", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "OK")
 	})
 
