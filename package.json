@@ -1,0 +1,12 @@
+{
+  "name": "challenges-sync",
+  "version": "1.0.0",
+  "main": "sync.js",
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.8",
+    "js-yaml": "^4.1.0"
+  }
+}

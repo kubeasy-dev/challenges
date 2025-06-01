@@ -34,7 +34,7 @@ jobs:
 
       - name: Debug
         run: |
-          echo "Changed directories: ${{ steps.changed-files.outputs.all_changed_files }}"
+          echo "Changed challenges: ${{ steps.changed-files.outputs.all_changed_files }}"
 
   build-and-push:
     runs-on: ubuntu-latest

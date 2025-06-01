@@ -1,9 +1,9 @@
-title: "Access Pending"
+title: Access Pending
 description: |
   The app was deployed, the image looks fine, but nothing starts. 
   Dig into what happens before the first log line ever appears.
-theme: "rbac"
-difficulty: "advanced"
+theme: rbac-security
+difficulty: advanced
 estimated_time: 15
 initial_situation: | 
   A recent deployment was pushed using the usual CI process, with a custom image and a startup probe.  
