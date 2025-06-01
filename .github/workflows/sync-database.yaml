@@ -56,4 +56,4 @@ jobs:
           node sync.js "${{ matrix.challenge }}"
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPBASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
