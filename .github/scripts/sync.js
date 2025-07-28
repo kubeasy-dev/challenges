@@ -64,7 +64,7 @@ async function syncChallenge(folder) {
     }
 
     // Validate challenge data
-    const validationErrors = validateChallenge(challenge);
+    const validationErrors = await validateChallenge(challenge);
     if (validationErrors.length > 0) {
       throw new Error(`Validation errors:\n${validationErrors.join('\n')}`);
     }

@@ -3,6 +3,8 @@
  * Provides schema validation for challenge data
  */
 
+const { createClient } = require("@supabase/supabase-js");
+
 // Challenge schema definition
 const challengeSchema = {
   title: { type: 'string', required: true, maxLength: 255 },
@@ -19,11 +21,46 @@ const challengeSchema = {
 };
 
 /**
+ * Validates that a theme exists in the database
+ * @param {string} themeSlug - The theme slug to validate
+ * @returns {Promise<boolean>} True if theme exists, false otherwise
+ */
+async function validateThemeExists(themeSlug) {
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const SUPABASE_KEY = process.env.SUPABASE_KEY;
+
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
+    console.warn("Warning: SUPABASE_URL or SUPABASE_KEY not set, skipping theme validation");
+    return true; // Skip validation if credentials not available
+  }
+
+  try {
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    const { data, error } = await supabase
+      .from("themes")
+      .select("slug")
+      .eq("slug", themeSlug)
+      .single();
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 is "not found" error
+      console.warn(`Warning: Error checking theme existence: ${error.message}`);
+      return true; // Skip validation on database errors
+    }
+
+    return !!data; // Return true if theme found, false otherwise
+  } catch (err) {
+    console.warn(`Warning: Error validating theme: ${err.message}`);
+    return true; // Skip validation on connection errors
+  }
+}
+
+/**
  * Validates a challenge object against the schema
  * @param {Object} challenge - The challenge data to validate
- * @returns {Array} Array of validation error messages
+ * @returns {Promise<Array>} Promise that resolves to array of validation error messages
  */
-function validateChallenge(challenge) {
+async function validateChallenge(challenge) {
   const errors = [];
 
   for (const [field, rules] of Object.entries(challengeSchema)) {
@@ -63,7 +100,15 @@ function validateChallenge(challenge) {
     }
   }
 
+  // Special validation for theme field - check if it exists in database
+  if (challenge.theme && typeof challenge.theme === 'string') {
+    const themeExists = await validateThemeExists(challenge.theme);
+    if (!themeExists) {
+      errors.push(`Theme '${challenge.theme}' does not exist in the database`);
+    }
+  }
+
   return errors;
 }
 
-module.exports = { validateChallenge, challengeSchema };
+module.exports = { validateChallenge, validateThemeExists, challengeSchema };

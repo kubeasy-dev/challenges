@@ -35,7 +35,7 @@ if (challenges.length === 0) {
 }
 
 // Function to validate a single challenge
-function validateSingleChallenge(challengeFolder) {
+async function validateSingleChallenge(challengeFolder) {
   console.log(`\n🔍 Validating challenge: ${challengeFolder}`);
   
   const rootPath = path.resolve(__dirname, '../../');
@@ -61,7 +61,7 @@ function validateSingleChallenge(challengeFolder) {
     }
     
     // Validate challenge data structure
-    const validationErrors = validateChallenge(challengeData);
+    const validationErrors = await validateChallenge(challengeData);
     if (validationErrors.length > 0) {
       console.error(`❌ Validation errors in ${challengePath}:`);
       validationErrors.forEach(error => {
@@ -137,7 +137,7 @@ async function validateChallenges() {
       const trimmedChallenge = challenge.trim();
       if (!trimmedChallenge) continue;
       
-      const isValid = validateSingleChallenge(trimmedChallenge);
+      const isValid = await validateSingleChallenge(trimmedChallenge);
       if (isValid) {
         results.valid.push(trimmedChallenge);
       } else {
