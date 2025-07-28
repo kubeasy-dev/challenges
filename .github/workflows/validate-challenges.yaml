@@ -39,17 +39,19 @@ jobs:
         working-directory: .github/scripts
 
       - name: Validate changed challenges
+        id: validate
         if: steps.changed-files.outputs.any_changed == 'true'
         run: |
           echo "Validating changed challenge files..."
           echo "Changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
-          node .github/scripts/validate-challenges.js '${{ steps.changed-files.outputs.all_changed_files }}'
+          node .github/scripts/validate-challenges.js '${{ steps.changed-files.outputs.all_changed_files }}' 2>&1 | tee validation-output.txt
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        continue-on-error: true
 
       - name: Add PR comment on validation success
-        if: steps.changed-files.outputs.any_changed == 'true'
+        if: steps.changed-files.outputs.any_changed == 'true' && steps.validate.outcome == 'success'
         uses: actions/github-script@v7
         with:
           script: |
@@ -63,10 +65,57 @@ jobs:
               body: `## ✅ Challenge Validation Passed
             
             **Validated challenges:** ${challenges.length}
-            ${challenges.map(c => `- \`${c}\``).join('\n')}
+            ${challenges.map(c => \`- \\\`${c}\\\`\`).join('\\n')}
             
             All challenge files are valid and ready for review! 🎉`
             });
+
+      - name: Add PR comment on validation failure
+        if: steps.changed-files.outputs.any_changed == 'true' && steps.validate.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            let validationOutput = '';
+            try {
+              validationOutput = fs.readFileSync('validation-output.txt', 'utf8');
+            } catch (error) {
+              validationOutput = 'Unable to read validation output.';
+            }
+            
+            const changedFiles = "${{ steps.changed-files.outputs.all_changed_files }}".split(' ');
+            const challenges = changedFiles.filter(f => f.trim().length > 0);
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## ❌ Challenge Validation Failed
+            
+            **Challenges to fix:** ${challenges.length}
+            ${challenges.map(c => \`- \\\`${c}\\\`\`).join('\\n')}
+            
+            ### Validation Output:
+            \`\`\`
+            ${validationOutput}
+            \`\`\`
+            
+            💡 **To fix validation errors:**
+            1. Check the \`challenge.yaml\` syntax
+            2. Ensure all required fields are present
+            3. Verify data types and constraints
+            4. See \`.github/scripts/validation.js\` for the full schema
+            
+            Please fix the errors above and push your changes. 🔧`
+            });
+
+      - name: Fail workflow if validation failed
+        if: steps.changed-files.outputs.any_changed == 'true' && steps.validate.outcome == 'failure'
+        run: |
+          echo "❌ Challenge validation failed. Check the PR comment for details."
+          exit 1
 
       - name: No challenges to validate
         if: steps.changed-files.outputs.any_changed != 'true'
