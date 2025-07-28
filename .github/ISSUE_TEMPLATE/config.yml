@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 GitHub Discussions
+    url: https://github.com/kubeasy-dev/challenges/discussions
+    about: Ask questions and discuss challenges with the community
+  - name: 📚 Documentation
+    url: https://github.com/kubeasy-dev/challenges/blob/main/README.md
+    about: Check out our documentation and challenge guidelines

@@ -1,0 +1,124 @@
+name: 🐛 Bug Report
+description: Report a bug or issue with challenges, infrastructure, or documentation
+title: "[Bug]: "
+labels: ["bug", "triage"]
+assignees:
+  - kubeasy-dev
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this bug! Please fill out the information below to help us investigate and fix the issue.
+
+  - type: dropdown
+    id: bug-type
+    attributes:
+      label: Bug Type
+      description: What type of bug are you reporting?
+      options:
+        - Challenge content issue
+        - Infrastructure/deployment problem
+        - Documentation error
+        - Validation script issue
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: challenge-name
+    attributes:
+      label: Challenge Name
+      description: If this bug is related to a specific challenge, please specify which one
+      placeholder: e.g., access-pending, partial-outage, probes-drift
+    validations:
+      required: false
+
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is
+      placeholder: Describe what happened and what you expected to happen
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: A clear and concise description of what you expected to happen
+      placeholder: Describe what should have happened
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      description: Where did you encounter this bug?
+      multiple: true
+      options:
+        - Local development
+        - Kubernetes cluster
+        - CI/CD pipeline
+        - Documentation site
+        - GitHub repository
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment-details
+    attributes:
+      label: Environment Details
+      description: Please provide details about your environment
+      placeholder: |
+        - OS: [e.g., macOS, Ubuntu, Windows]
+        - Kubernetes version: [e.g., 1.28.2]
+        - kubectl version: [e.g., 1.28.2]
+        - Browser: [e.g., Chrome 91, Safari 14] (if applicable)
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs/Output
+      description: Please paste any relevant log output, error messages, or screenshots
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here
+      placeholder: Any additional information that might be helpful
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Verification
+      description: Please confirm the following
+      options:
+        - label: I have searched for existing issues that might be related to this bug
+          required: true
+        - label: I have provided all the necessary information to reproduce this issue
+          required: true
+        - label: I agree to follow this project's Code of Conduct
+          required: true

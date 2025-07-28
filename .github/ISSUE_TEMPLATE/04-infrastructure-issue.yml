@@ -1,0 +1,156 @@
+name: 🏗️ Infrastructure Issue
+description: Report issues with CI/CD, automation, or project infrastructure
+title: "[Infrastructure]: "
+labels: ["infrastructure", "ops", "triage"]
+assignees:
+  - kubeasy-dev
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Report infrastructure-related issues such as CI/CD problems, automation failures, or deployment issues.
+
+  - type: dropdown
+    id: infrastructure-type
+    attributes:
+      label: Infrastructure Component
+      description: Which infrastructure component is affected?
+      options:
+        - GitHub Actions workflow
+        - Validation scripts
+        - Sync automation
+        - Repository configuration
+        - Documentation build
+        - Deployment process
+        - Monitoring/alerting
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity Level
+      description: How severe is this infrastructure issue?
+      options:
+        - Low (minor inconvenience)
+        - Medium (affects functionality)
+        - High (blocks development)
+        - Critical (system down)
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue-description
+    attributes:
+      label: Issue Description
+      description: Describe the infrastructure issue
+      placeholder: What's not working as expected with the infrastructure?
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: How is this issue affecting the project or users?
+      placeholder: Who is affected and how? What functionality is impacted?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: How to Reproduce
+      description: Steps to reproduce the infrastructure issue
+      placeholder: |
+        1. Trigger the workflow/process by...
+        2. Observe the failure at...
+        3. Check logs/outputs showing...
+    validations:
+      required: false
+
+  - type: input
+    id: workflow-run
+    attributes:
+      label: Failed Workflow Run
+      description: If this is about a GitHub Action, please provide the run URL
+      placeholder: https://github.com/kubeasy-dev/challenges/actions/runs/...
+    validations:
+      required: false
+
+  - type: textarea
+    id: error-logs
+    attributes:
+      label: Error Logs
+      description: Please paste relevant error logs, stack traces, or failure output
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: system-info
+    attributes:
+      label: System Information
+      description: Relevant system or environment information
+      placeholder: |
+        - GitHub Actions runner: [e.g., ubuntu-latest]
+        - Node.js version: [e.g., 18.x]
+        - Dependencies: [relevant package versions]
+        - Timing: [when did this start happening?]
+    validations:
+      required: false
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: Current Workaround
+      description: Is there a temporary workaround being used?
+      placeholder: Describe any temporary solutions or manual steps being taken
+    validations:
+      required: false
+
+  - type: dropdown
+    id: frequency
+    attributes:
+      label: Frequency
+      description: How often does this issue occur?
+      options:
+        - Always (100% reproduction)
+        - Frequently (>50% of the time)
+        - Sometimes (intermittent)
+        - Rarely (hard to reproduce)
+        - First occurrence
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution
+      description: If you have ideas on how to fix this, please share them
+      placeholder: Any suggestions for resolving this infrastructure issue
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other relevant information
+      placeholder: Screenshots, related issues, recent changes, etc.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Verification
+      description: Please confirm the following
+      options:
+        - label: I have checked that this isn't a duplicate of an existing issue
+          required: true
+        - label: I have provided sufficient information for investigation
+          required: true
+        - label: I agree to follow this project's Code of Conduct
+          required: true
