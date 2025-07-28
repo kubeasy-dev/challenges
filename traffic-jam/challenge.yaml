@@ -2,7 +2,7 @@ title: Traffic Jam
 description: |
   The new microservice is deployed and running, but external traffic can't reach it.
   Internal services can communicate fine, but something is blocking ingress traffic.
-theme: deployment
+theme: networking
 difficulty: advanced
 estimated_time: 20
 initial_situation: |

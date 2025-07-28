@@ -2,7 +2,7 @@ title: Out of Space
 description: |
   The database pod was working fine until this morning. Now it won't start.
   The logs mention something about mounting volumes, but the PVC shows as Bound.
-theme: storage
+theme: volumes-secrets
 difficulty: intermediate
 estimated_time: 15
 initial_situation: |
