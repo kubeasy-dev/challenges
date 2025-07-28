@@ -1,0 +1,14 @@
+title: Out of Space
+description: |
+  The database pod was working fine until this morning. Now it won't start.
+  The logs mention something about mounting volumes, but the PVC shows as Bound.
+theme: storage
+difficulty: intermediate
+estimated_time: 15
+initial_situation: |
+  A PostgreSQL database was deployed with persistent storage yesterday and was working normally.
+  This morning, the pod started crash-looping with mount-related errors.
+  The PersistentVolumeClaim appears to be bound, but something is preventing the pod from starting.
+objective: |
+  Get the database pod running again by resolving the storage mounting issue.
+  The data must remain intact - do not recreate the PVC or lose existing data.

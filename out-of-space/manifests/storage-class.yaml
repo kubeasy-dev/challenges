@@ -1,0 +1,15 @@
+# Storage class that doesn't exist - this is the issue!
+# The PVC will remain in Pending state because the referenced storage class is missing
+# Users need to either:
+# 1. Create the missing storage class, or 
+# 2. Change the PVC to use an existing storage class (like 'standard' or 'gp2')
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: standard-ssd
+provisioner: kubernetes.io/gce-pd
+parameters:
+  type: pd-ssd
+  replication-type: none
+allowVolumeExpansion: true

@@ -1,0 +1,14 @@
+title: Traffic Jam
+description: |
+  The new microservice is deployed and running, but external traffic can't reach it.
+  Internal services can communicate fine, but something is blocking ingress traffic.
+theme: deployment
+difficulty: advanced
+estimated_time: 20
+initial_situation: |
+  A microservice was deployed with proper service configuration and an ingress controller is running.
+  The service is healthy and responds to internal cluster requests.
+  However, external traffic through the ingress is getting 503 errors or timeouts.
+objective: |
+  Enable external traffic to reach the microservice through the ingress.
+  External clients should be able to access the service at the configured hostname.

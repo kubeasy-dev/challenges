@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  # This config has invalid JSON syntax - missing comma and wrong format
+  config.json: |
+    {
+      "database": {
+        "host": "localhost"
+        "port": 5432
+        "name": "myapp"
+      }
+      "server": {
+        "port": 8080,
+        "host": "0.0.0.0"
+      }
+    }

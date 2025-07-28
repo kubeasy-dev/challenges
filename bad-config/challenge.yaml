@@ -1,0 +1,14 @@
+title: Bad Config
+description: |
+  The web application keeps crashing on startup. The deployment looks fine, 
+  but something in the configuration is wrong.
+theme: configuration
+difficulty: beginner
+estimated_time: 10
+initial_situation: |
+  A simple web application was deployed with a ConfigMap for configuration.
+  The pod starts but immediately crashes with configuration-related errors.
+  All the files are there, but the application can't read its config properly.
+objective: |
+  Fix the configuration issue so the web application starts successfully and stays running.
+  The application should be able to read its configuration file.

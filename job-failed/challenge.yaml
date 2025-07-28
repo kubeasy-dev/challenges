@@ -1,0 +1,14 @@
+title: Job Failed
+description: |
+  The nightly data processing job has been failing for the past week.
+  It used to work fine, but now it times out and gets killed by Kubernetes.
+theme: troubleshooting
+difficulty: intermediate
+estimated_time: 15
+initial_situation: |
+  A CronJob that processes data every night has been consistently failing.
+  The job starts running but gets terminated before completion.
+  The processing logic hasn't changed, but something in the cluster configuration is causing issues.
+objective: |
+  Fix the job configuration so it can complete successfully within reasonable time limits.
+  The job should run to completion without being killed by Kubernetes.
