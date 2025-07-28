@@ -44,6 +44,9 @@ jobs:
           echo "Validating changed challenge files..."
           echo "Changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
           node .github/scripts/validate-challenges.js '${{ steps.changed-files.outputs.all_changed_files }}'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
 
       - name: Add PR comment on validation success
         if: steps.changed-files.outputs.any_changed == 'true'
