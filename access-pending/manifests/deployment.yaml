@@ -14,7 +14,7 @@ spec:
     spec:
       serviceAccountName: startup-checker
       containers:
-        - name: app
+        - name: startup-app
           image: ghcr.io/kubeasy-dev/access-pending:latest
           ports:
             - containerPort: 8080
