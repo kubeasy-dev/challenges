@@ -58,6 +58,8 @@ jobs:
             const changedFiles = "${{ steps.changed-files.outputs.all_changed_files }}".split(' ');
             const challenges = changedFiles.filter(f => f.trim().length > 0);
             
+            const challengeList = challenges.map(c => `- \`${c}\``).join('\n');
+            
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -65,7 +67,7 @@ jobs:
               body: `## ✅ Challenge Validation Passed
             
             **Validated challenges:** ${challenges.length}
-            ${challenges.map(c => \`- \\\`${c}\\\`\`).join('\\n')}
+            ${challengeList}
             
             All challenge files are valid and ready for review! 🎉`
             });
@@ -88,6 +90,8 @@ jobs:
             const changedFiles = "${{ steps.changed-files.outputs.all_changed_files }}".split(' ');
             const challenges = changedFiles.filter(f => f.trim().length > 0);
             
+            const challengeList = challenges.map(c => `- \`${c}\``).join('\n');
+            
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -95,7 +99,7 @@ jobs:
               body: `## ❌ Challenge Validation Failed
             
             **Challenges to fix:** ${challenges.length}
-            ${challenges.map(c => \`- \\\`${c}\\\`\`).join('\\n')}
+            ${challengeList}
             
             ### Validation Output:
             \`\`\`
