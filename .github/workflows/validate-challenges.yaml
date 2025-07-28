@@ -60,7 +60,7 @@ jobs:
               body: `## ✅ Challenge Validation Passed
             
             **Validated challenges:** ${challenges.length}
-            ${challenges.map(c => \`- \\\`${c}\\\`\`).join('\\n')}
+            ${challenges.map(c => `- \`${c}\``).join('\n')}
             
             All challenge files are valid and ready for review! 🎉`
             });
