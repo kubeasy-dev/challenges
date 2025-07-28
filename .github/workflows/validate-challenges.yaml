@@ -44,14 +44,24 @@ jobs:
         run: |
           echo "Validating changed challenge files..."
           echo "Changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
-          node .github/scripts/validate-challenges.js '${{ steps.changed-files.outputs.all_changed_files }}' 2>&1 | tee validation-output.txt
+          
+          # Run validation and capture output
+          if node .github/scripts/validate-challenges.js '${{ steps.changed-files.outputs.all_changed_files }}' > validation-output.txt 2>&1; then
+            echo "VALIDATION_STATUS=success" >> $GITHUB_OUTPUT
+            echo "✅ Validation succeeded"
+          else
+            echo "VALIDATION_STATUS=failure" >> $GITHUB_OUTPUT
+            echo "❌ Validation failed"
+          fi
+          
+          # Always show the output
+          cat validation-output.txt
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-        continue-on-error: true
 
       - name: Add PR comment on validation success
-        if: steps.changed-files.outputs.any_changed == 'true' && steps.validate.outcome == 'success'
+        if: steps.changed-files.outputs.any_changed == 'true' && steps.validate.outputs.VALIDATION_STATUS == 'success'
         uses: actions/github-script@v7
         with:
           script: |
@@ -73,7 +83,7 @@ jobs:
             });
 
       - name: Add PR comment on validation failure
-        if: steps.changed-files.outputs.any_changed == 'true' && steps.validate.outcome == 'failure'
+        if: steps.changed-files.outputs.any_changed == 'true' && steps.validate.outputs.VALIDATION_STATUS == 'failure'
         uses: actions/github-script@v7
         with:
           script: |
@@ -116,7 +126,7 @@ jobs:
             });
 
       - name: Fail workflow if validation failed
-        if: steps.changed-files.outputs.any_changed == 'true' && steps.validate.outcome == 'failure'
+        if: steps.changed-files.outputs.any_changed == 'true' && steps.validate.outputs.VALIDATION_STATUS == 'failure'
         run: |
           echo "❌ Challenge validation failed. Check the PR comment for details."
           exit 1
