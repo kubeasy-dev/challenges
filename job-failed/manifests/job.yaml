@@ -1,0 +1,31 @@
+# Manual job for testing purposes
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: data-processor-manual
+spec:
+  # Same issue as CronJob - timeout too short
+  activeDeadlineSeconds: 30
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: processor
+          image: busybox:latest
+          command: ["/bin/sh"]
+          args: 
+            - -c
+            - |
+              echo "Starting manual data processing test..."
+              for i in $(seq 1 12); do
+                echo "Processing batch $i/12"
+                sleep 5
+              done
+              echo "Manual processing completed!"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"

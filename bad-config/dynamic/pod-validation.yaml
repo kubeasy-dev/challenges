@@ -1,0 +1,20 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: DynamicValidation
+metadata:
+  name: app-running
+spec:
+  target:
+    apiVersion: v1
+    kind: Pod
+    labelSelector:
+      matchLabels:
+        app: web-app
+  checks:
+    - kind: status
+      statusCheck:
+        condition: "Ready"
+        expectedStatus: "True"
+    - kind: logs
+      logCheck:
+        container: app
+        expectedString: "Config validated"

@@ -1,0 +1,13 @@
+title: Bad Config
+description: |
+  The web application keeps crashing on startup. The deployment looks fine, 
+  but something in the configuration is wrong.
+theme: pods-containers
+difficulty: beginner
+estimated_time: 10
+initial_situation: |
+  A web application was deployed this morning, but something went wrong during startup.
+  The deployment completed without errors, yet the pods keep failing.
+objective: |
+  Get the application running and stable. 
+  Investigate what's preventing the normal startup sequence.

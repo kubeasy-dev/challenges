@@ -1,0 +1,39 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: restrict-ingress-modifications
+spec:
+  validationFailureAction: enforce
+  background: true
+  rules:
+    - name: preserve-ingress-config
+      match:
+        resources:
+          kinds: ["Ingress"]
+          names: ["api-ingress"]
+      validate:
+        message: "Ingress configuration must be preserved"
+        pattern:
+          spec:
+            rules:
+              - host: "api.example.com"
+                http:
+                  paths:
+                    - backend:
+                        service:
+                          name: "api-service"
+
+    - name: preserve-deployment-labels
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["api-service"]
+      validate:
+        message: "Deployment labels must be preserved"
+        pattern:
+          spec:
+            template:
+              metadata:
+                labels:
+                  app: "api-service"
+                  version: "v1"
