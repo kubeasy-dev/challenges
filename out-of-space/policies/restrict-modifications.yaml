@@ -1,0 +1,35 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: restrict-storage-modifications
+spec:
+  validationFailureAction: enforce
+  background: true
+  rules:
+    - name: preserve-data-integrity
+      match:
+        resources:
+          kinds: ["PersistentVolumeClaim"]
+          names: ["postgres-data"]
+      validate:
+        message: "PVC cannot be deleted - data must remain intact"
+        pattern:
+          metadata:
+            name: "postgres-data"
+
+    - name: preserve-volume-mount
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["postgres"]
+      validate:
+        message: "Volume mount configuration must be preserved"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: "*"
+                    volumeMounts:
+                      - name: "postgres-storage"
+                        mountPath: "/var/lib/postgresql/data"

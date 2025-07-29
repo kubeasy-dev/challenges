@@ -10,5 +10,5 @@ initial_situation: |
   The job starts running but gets terminated before completion.
   The processing logic hasn't changed, but something in the cluster configuration is causing issues.
 objective: |
-  Fix the job configuration so it can complete successfully within reasonable time limits.
-  The job should run to completion without being killed by Kubernetes.
+  Investigate why the nightly job keeps failing and restore normal operation.
+  The processing workflow should complete successfully every night.

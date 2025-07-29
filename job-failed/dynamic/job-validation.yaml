@@ -1,0 +1,20 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: DynamicValidation
+metadata:
+  name: job-completion
+spec:
+  target:
+    apiVersion: batch/v1
+    kind: Job
+    labelSelector:
+      matchLabels:
+        job-name: data-processor
+  checks:
+    - kind: status
+      statusCheck:
+        condition: "Complete"
+        expectedStatus: "True"
+    - kind: logs
+      logCheck:
+        container: processor
+        expectedString: "Data processing completed successfully!"

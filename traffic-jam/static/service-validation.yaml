@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: service-validation
+data:
+  endpoint-check.rego: |
+    package kubeasy.challenge
+
+    violation[{"msg": msg}] {
+      input.kind == "Service"
+      input.metadata.name == "api-service"
+      selector := input.spec.selector
+      selector.app != "api-service"
+      msg := "Service selector may not match deployment labels"
+    }

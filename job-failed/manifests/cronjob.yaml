@@ -6,8 +6,7 @@ spec:
   schedule: "0 2 * * *"  # Daily at 2 AM
   jobTemplate:
     spec:
-      # Issue: activeDeadlineSeconds is too low for the actual processing time
-      activeDeadlineSeconds: 30  # Job will be killed after 30 seconds!
+      activeDeadlineSeconds: 30
       template:
         spec:
           restartPolicy: OnFailure

@@ -6,9 +6,8 @@ theme: pods-containers
 difficulty: beginner
 estimated_time: 10
 initial_situation: |
-  A simple web application was deployed with a ConfigMap for configuration.
-  The pod starts but immediately crashes with configuration-related errors.
-  All the files are there, but the application can't read its config properly.
+  A web application was deployed this morning, but something went wrong during startup.
+  The deployment completed without errors, yet the pods keep failing.
 objective: |
-  Fix the configuration issue so the web application starts successfully and stays running.
-  The application should be able to read its configuration file.
+  Get the application running and stable. 
+  Investigate what's preventing the normal startup sequence.

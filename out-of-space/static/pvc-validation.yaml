@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: storage-validation
+data:
+  pvc-storageclass.rego: |
+    package kubeasy.challenge
+
+    violation[{"msg": msg}] {
+      input.kind == "PersistentVolumeClaim"
+      input.metadata.name == "postgres-data"
+      sc := input.spec.storageClassName
+      sc == "fast-ssd"
+      msg := sprintf("StorageClass '%s' referenced in PVC may not be available", [sc])
+    }

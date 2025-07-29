@@ -24,7 +24,6 @@ spec:
             - name: config-volume
               mountPath: /etc/config
               readOnly: true
-          # This command will fail if the JSON is invalid
           command: ["/bin/sh"]
           args: ["-c", "nginx -g 'daemon off;' && python3 -m json.tool $CONFIG_FILE > /dev/null && echo 'Config validated' || exit 1"]
           resources:
