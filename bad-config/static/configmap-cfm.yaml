@@ -7,8 +7,6 @@ data:
     package kubeasy.challenge
 
     violation[{"msg": msg}] {
-      input.kind == "ConfigMap"
-      input.metadata.name == "app-config"
       config_data := input.data["config.json"]
       # Check for missing comma after localhost
       contains(config_data, "\"localhost\"\n")

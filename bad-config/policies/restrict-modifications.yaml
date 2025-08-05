@@ -38,3 +38,18 @@ spec:
                   - name: "config-volume"
                     configMap:
                       name: "app-config"
+
+    - name: preserve-image
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["web-app"]
+      validate:
+        message: "Container image must be preserved"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: "app"
+                    image: "python:3"

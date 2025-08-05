@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: nginx:alpine
+          image: python:3
           ports:
             - containerPort: 8080
           env:
@@ -25,7 +25,7 @@ spec:
               mountPath: /etc/config
               readOnly: true
           command: ["/bin/sh"]
-          args: ["-c", "nginx -g 'daemon off;' && python3 -m json.tool $CONFIG_FILE > /dev/null && echo 'Config validated' || exit 1"]
+          args: ["-c", "python3 -m json.tool $CONFIG_FILE > /dev/null && echo 'Config validated' && python -m http.server 8000"]
           resources:
             requests:
               cpu: "50m"
@@ -33,6 +33,19 @@ spec:
             limits:
               cpu: "100m"
               memory: "128Mi"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8000 
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 10
+      restartPolicy: Always
       volumes:
         - name: config-volume
           configMap:
