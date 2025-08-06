@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-app
+  template:
+    metadata:
+      labels:
+        app: web-app
+    spec:
+      containers:
+        - name: app
+          image: python:3
+          ports:
+            - containerPort: 8080
+          env:
+            - name: CONFIG_FILE
+              value: "/etc/config/config.json"
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/config
+              readOnly: true
+          command: ["/bin/sh"]
+          args: ["-c", "python3 -m json.tool $CONFIG_FILE > /dev/null && echo 'Config validated' && python -m http.server 8000"]
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "100m"
+              memory: "128Mi"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8000 
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 10
+      restartPolicy: Always
+      volumes:
+        - name: config-volume
+          configMap:
+            name: app-config

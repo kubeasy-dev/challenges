@@ -10,9 +10,12 @@ challenges/
 │   ├── scripts/          # Synchronization scripts for Supabase
 │   └── workflows/        # GitHub Actions workflows
 ├── access-pending/       # RBAC security challenge
+├── bad-config/           # Configuration management challenge
+├── job-failed/           # Troubleshooting batch jobs challenge
+├── out-of-space/         # Storage and persistent volumes challenge
 ├── partial-outage/       # Network policies challenge  
 ├── probes-drift/         # Health checks challenge
-└── test-challenge/       # Example challenge structure
+└── traffic-jam/          # Ingress and traffic routing challenge
 ```
 
 ## Challenge Structure

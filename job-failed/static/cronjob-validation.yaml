@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cronjob-validation
+data:
+  deadline-check.rego: |
+    package kubeasy.challenge
+
+    violation[{"msg": msg}] {
+      input.kind == "CronJob"
+      input.metadata.name == "data-processor"
+      deadline := input.spec.jobTemplate.spec.activeDeadlineSeconds
+      deadline < 60
+      msg := sprintf("Active deadline of %d seconds may be insufficient for processing", [deadline])
+    }
