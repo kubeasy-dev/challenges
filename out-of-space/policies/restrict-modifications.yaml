@@ -21,7 +21,7 @@ spec:
       match:
         resources:
           kinds: ["Deployment"]
-          names: ["postgres"]
+          names: ["postgres-db"]
       validate:
         message: "Volume mount configuration must be preserved"
         pattern:
@@ -33,3 +33,18 @@ spec:
                     volumeMounts:
                       - name: "postgres-storage"
                         mountPath: "/var/lib/postgresql/data"
+
+    - name: preserve-postgres-image
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["postgres-db"]
+      validate:
+        message: "Postgres container image must remain postgres:13"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: "postgres"
+                    image: "postgres:13"

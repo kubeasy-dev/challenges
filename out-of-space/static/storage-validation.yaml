@@ -1,0 +1,11 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: StaticValidation
+metadata:
+  name: validate-storage
+spec:
+  target:
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    name: postgres-data
+  rulesConfigMap:
+    name: storage-validation
