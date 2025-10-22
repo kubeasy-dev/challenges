@@ -1,0 +1,54 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: restrict-security-modifications
+spec:
+  validationFailureAction: enforce
+  background: true
+  rules:
+    - name: preserve-container-image
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["legacy-app"]
+      validate:
+        message: "Container image must be preserved - fix the securityContext instead"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: "app"
+                    image: "python:3.11-slim"
+
+    - name: preserve-container-command
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["legacy-app"]
+      validate:
+        message: "Container command must be preserved - the application code is not the problem"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: "app"
+                    command:
+                      - "/bin/sh"
+
+    - name: no-privileged-mode
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["legacy-app"]
+      validate:
+        message: "Privileged mode is not allowed - this would bypass security policies"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: "app"
+                    =(securityContext):
+                      =(privileged): false

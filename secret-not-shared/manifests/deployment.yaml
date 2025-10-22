@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-service
+  template:
+    metadata:
+      labels:
+        app: api-service
+    spec:
+      containers:
+        - name: api
+          image: python:3.11-slim
+          command: ["/bin/sh"]
+          args:
+            - "-c"
+            - |
+              echo "=========================================="
+              echo "API Service Starting..."
+              echo "=========================================="
+              echo "Checking database configuration..."
+
+              # Check if required environment variables are set
+              if [ -z "$DATABASE_HOST" ]; then
+                echo "ERROR: DATABASE_HOST environment variable not set!"
+                exit 1
+              fi
+
+              if [ -z "$DATABASE_USER" ]; then
+                echo "ERROR: DATABASE_USER environment variable not set!"
+                exit 1
+              fi
+
+              if [ -z "$DATABASE_PASSWORD" ]; then
+                echo "ERROR: DATABASE_PASSWORD environment variable not set!"
+                exit 1
+              fi
+
+              echo "✓ DATABASE_HOST: $DATABASE_HOST"
+              echo "✓ DATABASE_USER: $DATABASE_USER"
+              echo "✓ DATABASE_PASSWORD: [REDACTED]"
+              echo ""
+              echo "Database configuration complete!"
+              echo "Starting API server on port 8080..."
+              echo "=========================================="
+
+              # Simulate API service running
+              python3 -m http.server 8080
+          ports:
+            - containerPort: 8080
+          # PROBLEM: Secret reference is missing or incorrectly configured
+          # The Secret exists but the env variables are not defined
+          env:
+            - name: DATABASE_HOST
+              value: "wrong-host.example.com"  # Hardcoded wrong value
+            # DATABASE_USER and DATABASE_PASSWORD are missing!
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "100m"
+              memory: "128Mi"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 5
+      restartPolicy: Always

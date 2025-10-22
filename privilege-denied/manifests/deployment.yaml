@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: legacy-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: legacy-app
+  template:
+    metadata:
+      labels:
+        app: legacy-app
+    spec:
+      # PROBLEM 1: No securityContext defined
+      # The pod will try to run as root (uid 0)
+      # securityContext:
+      #   runAsNonRoot: true
+      #   runAsUser: 1000
+      #   fsGroup: 1000
+
+      containers:
+        - name: app
+          image: python:3.11-slim
+          command: ["/bin/sh"]
+          args:
+            - "-c"
+            - |
+              echo "=========================================="
+              echo "Legacy Application Starting..."
+              echo "=========================================="
+              echo "Current user: $(whoami) (uid: $(id -u))"
+
+              # PROBLEM 2: Trying to write to root filesystem
+              # This will fail with readOnlyRootFilesystem: true
+              echo "Attempting to write to /tmp..."
+              echo "test" > /tmp/test.txt
+
+              echo "Application started successfully!"
+              echo "Starting web server on port 8080..."
+              echo "=========================================="
+
+              # Keep running
+              python3 -m http.server 8080
+
+          # PROBLEM 3: No container-level securityContext
+          # Missing: runAsNonRoot, readOnlyRootFilesystem, allowPrivilegeEscalation
+          # securityContext:
+          #   runAsNonRoot: true
+          #   runAsUser: 1000
+          #   allowPrivilegeEscalation: false
+          #   readOnlyRootFilesystem: true
+          #   capabilities:
+          #     drop:
+          #       - ALL
+
+          ports:
+            - containerPort: 8080
+
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "100m"
+              memory: "128Mi"
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 5
+
+      restartPolicy: Always

@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: check-deployment-resources
+data:
+  memory-limits-check.rego: |
+    package kubeasy.challenge
+
+    # Check that memory limit is sufficient (at least 100Mi for data processor)
+    # The broken deployment has 50Mi which is too low
+    violation[{"msg": msg}] {
+      container := input.spec.template.spec.containers[_]
+      container.resources.limits.memory == "50Mi"
+      msg := "Memory limit is too low (50Mi). The application needs at least 100Mi to run without OOMKilled errors"
+    }
+
+  memory-requests-check.rego: |
+    package kubeasy.challenge
+
+    # Check that memory request is sufficient
+    violation[{"msg": msg}] {
+      container := input.spec.template.spec.containers[_]
+      container.resources.requests.memory == "32Mi"
+      msg := "Memory request should be increased to at least 64Mi for stable operation"
+    }
