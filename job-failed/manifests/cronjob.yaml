@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: data-processor
+spec:
+  schedule: "0 2 * * *"
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 30
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: processor
+              image: busybox:latest
+              command: ["/bin/sh"]
+              args:
+                - -c
+                - |
+                  echo "Starting data processing..."
+                  for i in $(seq 1 12); do
+                    echo "Processing batch $i/12"
+                    sleep 5
+                  done
+                  echo "Data processing completed successfully!"
+              resources:
+                requests:
+                  cpu: "100m"
+                  memory: "128Mi"
+                limits:
+                  cpu: "500m"
+                  memory: "256Mi"

@@ -1,0 +1,70 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: restrict-resource-modifications
+spec:
+  validationFailureAction: enforce
+  background: true
+  rules:
+    - name: preserve-container-image
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["data-processor"]
+      validate:
+        message: "Container image must be preserved - fix the resource limits instead"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: "processor"
+                    image: "python:3.11-slim"
+
+    - name: preserve-container-command
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["data-processor"]
+      validate:
+        message: "Container command must be preserved - the application code is not the problem"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: "processor"
+                    command:
+                      - "/bin/sh"
+
+    - name: prevent-resource-removal
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["data-processor"]
+      validate:
+        message: "Resource limits and requests must be defined - removing them is not the solution"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: "processor"
+                    resources:
+                      limits:
+                        cpu: "?*"
+                        memory: "?*"
+                      requests:
+                        cpu: "?*"
+                        memory: "?*"
+
+    - name: prevent-replica-scale-up
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["data-processor"]
+      validate:
+        message: "Scaling replicas won't fix the OOMKilled issue - adjust resource limits instead"
+        pattern:
+          spec:
+            replicas: 1

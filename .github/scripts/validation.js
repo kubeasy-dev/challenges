@@ -3,56 +3,33 @@
  * Provides schema validation for challenge data
  */
 
-const { createClient } = require("@supabase/supabase-js");
-
 // Challenge schema definition
 const challengeSchema = {
   title: { type: 'string', required: true, maxLength: 255 },
   description: { type: 'string', required: true },
   theme: { type: 'string', required: true },
-  difficulty: { 
-    type: 'string', 
-    required: true, 
-    enum: ['beginner', 'intermediate', 'advanced'] 
+  difficulty: {
+    type: 'string',
+    required: true,
+    enum: ['easy', 'medium', 'hard']
   },
   estimated_time: { type: 'number', required: true, min: 1 },
-  initial_situation: { type: 'string', required: false },
-  objective: { type: 'string', required: false }
+  initial_situation: { type: 'string', required: true },
+  objective: { type: 'string', required: true },
+  of_the_week: { type: 'boolean', required: false }
 };
 
 /**
- * Validates that a theme exists in the database
+ * Validates that a theme exists using the API
+ * Note: Theme validation is now handled by the sync API endpoint
+ * This function is kept for backward compatibility but always returns true
  * @param {string} themeSlug - The theme slug to validate
- * @returns {Promise<boolean>} True if theme exists, false otherwise
+ * @returns {Promise<boolean>} Always returns true (validation done by API)
  */
 async function validateThemeExists(themeSlug) {
-  const SUPABASE_URL = process.env.SUPABASE_URL;
-  const SUPABASE_KEY = process.env.SUPABASE_KEY;
-
-  if (!SUPABASE_URL || !SUPABASE_KEY) {
-    console.warn("Warning: SUPABASE_URL or SUPABASE_KEY not set, skipping theme validation");
-    return true; // Skip validation if credentials not available
-  }
-
-  try {
-    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-    
-    const { data, error } = await supabase
-      .from("themes")
-      .select("slug")
-      .eq("slug", themeSlug)
-      .single();
-
-    if (error && error.code !== 'PGRST116') { // PGRST116 is "not found" error
-      console.warn(`Warning: Error checking theme existence: ${error.message}`);
-      return true; // Skip validation on database errors
-    }
-
-    return !!data; // Return true if theme found, false otherwise
-  } catch (err) {
-    console.warn(`Warning: Error validating theme: ${err.message}`);
-    return true; // Skip validation on connection errors
-  }
+  // Theme existence validation is now handled by the sync API endpoint
+  // The API will return an error if a theme doesn't exist
+  return true;
 }
 
 /**
@@ -82,6 +59,8 @@ async function validateChallenge(challenge) {
       errors.push(`Field ${field} must be a string`);
     } else if (rules.type === 'number' && typeof value !== 'number') {
       errors.push(`Field ${field} must be a number`);
+    } else if (rules.type === 'boolean' && typeof value !== 'boolean') {
+      errors.push(`Field ${field} must be a boolean`);
     }
 
     // String length validation

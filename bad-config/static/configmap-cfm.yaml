@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: check-deployment-annotations
+data:
+  configmap-checksum-annotation.rego: |
+    package kubeasy.challenge
+
+    violation[{"msg": msg}] {
+      not input.spec.template.metadata.annotations
+      msg := "Deployment template must have annotations to track ConfigMap changes"
+    }
+
+    violation[{"msg": msg}] {
+      annotations := input.spec.template.metadata.annotations
+      not annotations["configmap/checksum"]
+      msg := "Deployment template must have 'configmap/checksum' annotation for rolling updates"
+    }

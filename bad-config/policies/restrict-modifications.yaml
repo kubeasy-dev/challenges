@@ -1,0 +1,55 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: restrict-config-modifications
+spec:
+  validationFailureAction: enforce
+  background: true
+  rules:
+    - name: preserve-volume-mount
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["web-app"]
+      validate:
+        message: "Volume mount configuration must be preserved"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: "*"
+                    volumeMounts:
+                      - name: "config-volume"
+                        mountPath: "/etc/config"
+
+    - name: preserve-config-reference
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["web-app"]
+      validate:
+        message: "ConfigMap reference must be preserved"
+        pattern:
+          spec:
+            template:
+              spec:
+                volumes:
+                  - name: "config-volume"
+                    configMap:
+                      name: "app-config"
+
+    - name: preserve-image
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["web-app"]
+      validate:
+        message: "Container image must be preserved"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: "app"
+                    image: "python:3"

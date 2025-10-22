@@ -1,0 +1,11 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: StaticValidation
+metadata:
+  name: check-statefulset-config
+spec:
+  target:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: postgres-db
+  rulesConfigMap:
+    name: check-statefulset

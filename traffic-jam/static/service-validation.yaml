@@ -1,0 +1,11 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: StaticValidation
+metadata:
+  name: check-deployment-probes
+spec:
+  target:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api-service
+  rulesConfigMap:
+    name: check-probes

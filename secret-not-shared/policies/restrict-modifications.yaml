@@ -1,0 +1,67 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: restrict-secret-modifications
+spec:
+  validationFailureAction: enforce
+  background: true
+  rules:
+    - name: preserve-secret-existence
+      match:
+        resources:
+          kinds: ["Secret"]
+          names: ["database-credentials"]
+      validate:
+        message: "The database-credentials Secret must not be deleted - it contains the actual credentials"
+        deny:
+          conditions:
+            any:
+              - key: "{{ request.operation }}"
+                operator: Equals
+                value: DELETE
+
+    - name: preserve-container-image
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["api-service"]
+      validate:
+        message: "Container image must be preserved - fix the Secret configuration instead"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: "api"
+                    image: "python:3.11-slim"
+
+    - name: preserve-container-command
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["api-service"]
+      validate:
+        message: "Container command must be preserved - the application code is not the problem"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: "api"
+                    command:
+                      - "/bin/sh"
+
+    - name: prevent-envfrom-shortcut
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["api-service"]
+      validate:
+        message: "Use individual env variables with valueFrom, not envFrom - this tests your understanding of Secret references"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: "api"
+                    =(envFrom): null

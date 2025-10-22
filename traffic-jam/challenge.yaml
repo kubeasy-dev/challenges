@@ -1,0 +1,15 @@
+title: Traffic Jam
+description: |
+  The pods work. The Service exists. The Ingress is configured. Yet: 503.
+  Something invisible is blocking the traffic.
+theme: networking
+difficulty: hard
+estimated_time: 20
+initial_situation: |
+  A microservice was deployed behind an Ingress controller for external access.
+  The pods are Running and respond perfectly when accessed directly.
+  The Service configuration looks correct and matches the pod labels.
+  But accessing through the Ingress consistently returns 503 Service Unavailable.
+objective: |
+  Find what's breaking the traffic flow from Ingress to pods.
+  Everything looks right on paper - dig deeper.

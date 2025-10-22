@@ -1,0 +1,52 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: restrict-logging-modifications
+spec:
+  validationFailureAction: enforce
+  background: true
+  rules:
+    - name: preserve-container-images
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["web-app"]
+      validate:
+        message: "Container images must be preserved - fix the logging configuration instead"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: "app"
+                    image: "python:3.11-slim"
+                  - name: "logger"
+                    image: "python:3.11-slim"
+
+    - name: preserve-container-count
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["web-app"]
+      validate:
+        message: "Must keep both containers (app and logger) - don't delete the logger container"
+        deny:
+          conditions:
+            any:
+              - key: "{{ length(request.object.spec.template.spec.containers) }}"
+                operator: LessThan
+                value: 2
+
+    - name: preserve-logger-container
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["web-app"]
+      validate:
+        message: "Logger container must exist - fix its logging, don't delete it"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: "logger"

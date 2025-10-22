@@ -1,0 +1,11 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: StaticValidation
+metadata:
+  name: check-configmap
+spec:
+  target:
+    apiVersion: v1
+    kind: ConfigMap
+    name: app-config
+  rulesConfigMap:
+    name: configmap-validation

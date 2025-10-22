@@ -1,0 +1,11 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: StaticValidation
+metadata:
+  name: validate-endpoints
+spec:
+  target:
+    apiVersion: v1
+    kind: Service
+    name: api-service
+  rulesConfigMap:
+    name: service-validation

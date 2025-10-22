@@ -17,20 +17,20 @@ spec:
           image: ghcr.io/kubeasy-dev/probes-drift:latest
           livenessProbe:
             httpGet:
-              path: /healthz
+              path: /health/live
               port: 8080
-            initialDelaySeconds: 3
-            failureThreshold: 1
-            sucessThreshold: 3
-            periodSeconds: 1
+            initialDelaySeconds: 5
+            failureThreshold: 2
+            successThreshold: 1
+            periodSeconds: 5
           readinessProbe:
             httpGet:
-              path: /health
+              path: /health/ready
               port: 8080
             initialDelaySeconds: 3
             failureThreshold: 1
-            sucessThreshold: 3
-            periodSeconds: 1
+            successThreshold: 1
+            periodSeconds: 2
           resources:
             requests:
               cpu: 100m

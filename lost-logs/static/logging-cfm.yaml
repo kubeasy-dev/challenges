@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: check-logging-configuration
+data:
+  stdout-logging.rego: |
+    package kubeasy.challenge
+
+    violation[{"msg": msg}] {
+      container := input.spec.template.spec.containers[_]
+      container.name == "logger"
+      contains(container.args[1], ">> /var/log/app.log")
+      msg := "Logger container must write to stdout, not to /var/log/app.log file. Use 'echo' without redirection or pipe to stdout"
+    }
+
+  no-file-logging.rego: |
+    package kubeasy.challenge
+
+    violation[{"msg": msg}] {
+      container := input.spec.template.spec.containers[_]
+      args_str := concat(" ", container.args)
+      contains(args_str, ">>")
+      msg := sprintf("Container '%s' redirects output to a file (>>). Logs must go to stdout for kubectl logs to work", [container.name])
+    }

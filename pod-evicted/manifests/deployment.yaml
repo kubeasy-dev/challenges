@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-processor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: data-processor
+  template:
+    metadata:
+      labels:
+        app: data-processor
+    spec:
+      containers:
+        - name: processor
+          image: python:3.11-slim
+          command: ["/bin/sh"]
+          args:
+            - "-c"
+            - |
+              echo "=========================================="
+              echo "Data Processor Starting..."
+              echo "=========================================="
+              echo "Allocating memory for data processing..."
+
+              python3 -c "
+              import time
+              import sys
+
+              print('Loading data into memory...')
+              data = []
+              for i in range(10):
+                  chunk = 'x' * (8 * 1024 * 1024)
+                  data.append(chunk)
+                  print(f'Loaded chunk {i+1}/10 (~{(i+1)*8}MB in memory)')
+                  time.sleep(1)
+
+              print('Data loaded successfully!')
+              print('Processing data...')
+
+              while True:
+                  print('Processing batch...')
+                  time.sleep(10)
+              "
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "32Mi"
+            limits:
+              cpu: "200m"
+              memory: "50Mi"
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - "ps aux | grep python3 | grep -v grep"
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+      restartPolicy: Always

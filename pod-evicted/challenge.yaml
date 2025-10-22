@@ -1,0 +1,16 @@
+title: Pod Evicted
+description: |
+  A data processing pod keeps crashing and getting evicted.
+  It was working fine yesterday, but now Kubernetes keeps killing it.
+theme: resources-scaling
+difficulty: easy
+estimated_time: 15
+initial_situation: |
+  A data processing application is deployed as a single pod.
+  The pod starts successfully but after a few seconds gets OOMKilled (Out of Memory).
+  It enters a CrashLoopBackOff state and keeps restarting.
+  The application code hasn't changed, but Kubernetes is now enforcing resource limits.
+  The pod's memory usage exceeds the configured limit, causing eviction.
+objective: |
+  Fix the resource configuration so the pod can run without being evicted.
+  Understand the difference between requests and limits, and how Kubernetes manages resources.

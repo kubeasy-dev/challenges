@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-app
+  template:
+    metadata:
+      labels:
+        app: web-app
+    spec:
+      containers:
+        - name: app
+          image: python:3.11-slim
+          command: ["/bin/sh"]
+          args:
+            - "-c"
+            - |
+              echo "=========================================="
+              echo "Main Application Starting..."
+              echo "=========================================="
+
+              while true; do
+                echo "[$(date)] Main app: Processing request"
+                sleep 5
+              done
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "100m"
+              memory: "128Mi"
+
+        - name: logger
+          image: python:3.11-slim
+          command: ["/bin/sh"]
+          args:
+            - "-c"
+            - |
+              mkdir -p /var/log
+
+              while true; do
+                echo "[$(date)] Logger: Processed log entry" >> /var/log/app.log
+                sleep 3
+              done
+          volumeMounts:
+            - name: log-volume
+              mountPath: /var/log
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "100m"
+              memory: "128Mi"
+
+      volumes:
+        - name: log-volume
+          emptyDir: {}
+      restartPolicy: Always

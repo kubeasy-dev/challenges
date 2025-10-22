@@ -1,0 +1,11 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: StaticValidation
+metadata:
+  name: validate-deadline
+spec:
+  target:
+    apiVersion: batch/v1
+    kind: CronJob
+    name: data-processor
+  rulesConfigMap:
+    name: cronjob-validation
