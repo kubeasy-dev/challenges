@@ -1,14 +1,18 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: configmap-validation
+  name: check-deployment-annotations
 data:
-  json-syntax.rego: |
+  configmap-checksum-annotation.rego: |
     package kubeasy.challenge
 
     violation[{"msg": msg}] {
-      config_data := input.data["config.json"]
-      # Check for missing comma after localhost
-      contains(config_data, "\"localhost\"\n")
-      msg := "Configuration syntax appears to be invalid"
+      not input.spec.template.metadata.annotations
+      msg := "Deployment template must have annotations to track ConfigMap changes"
+    }
+
+    violation[{"msg": msg}] {
+      annotations := input.spec.template.metadata.annotations
+      not annotations["configmap/checksum"]
+      msg := "Deployment template must have 'configmap/checksum' annotation for rolling updates"
     }

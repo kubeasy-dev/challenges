@@ -1,3 +1,7 @@
+# This ConfigMap represents a configuration update that was applied
+# The ops team updated the cache setting to true, but the pods are still running
+# with the old configuration because there's no mechanism to trigger a rollout
+
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -15,7 +19,7 @@ data:
         "host": "0.0.0.0"
       },
       "features": {
-        "cache": false,
+        "cache": true,
         "analytics": true,
         "debug": false
       }
