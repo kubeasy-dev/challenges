@@ -3,19 +3,21 @@ kind: ConfigMap
 metadata:
   name: check-deployment
 data:
-  liveness-present.rego: |
+  startup-probe-present.rego: |
     package kubeasy.challenge
 
     violation[{"msg": msg}] {
       container := input.spec.template.spec.containers[_]
-      not container.livenessProbe
-      msg := "Liveness probe is missing"
+      not container.startupProbe
+      msg := "Startup probe is required for slow-starting applications"
     }
-  readiness-present.rego: |
+
+  readiness-initial-delay.rego: |
     package kubeasy.challenge
 
     violation[{"msg": msg}] {
       container := input.spec.template.spec.containers[_]
-      not container.readinessProbe
-      msg := "Readiness probe is missing"
+      container.readinessProbe
+      container.readinessProbe.initialDelaySeconds < 15
+      msg := "Readiness probe initialDelaySeconds should be at least 15 seconds for slow-starting apps"
     }

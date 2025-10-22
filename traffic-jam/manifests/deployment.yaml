@@ -31,13 +31,14 @@ spec:
               memory: "256Mi"
           readinessProbe:
             httpGet:
-              path: /
+              path: /healthz  # Problem: nginx doesn't have /healthz endpoint
               port: 80
             initialDelaySeconds: 5
-            periodSeconds: 3
+            periodSeconds: 5
+            failureThreshold: 3
           livenessProbe:
             httpGet:
-              path: /
+              path: /  # This works fine
               port: 80
             initialDelaySeconds: 10
             periodSeconds: 10

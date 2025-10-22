@@ -1,15 +1,11 @@
-apiVersion: v1
-kind: ConfigMap
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: StaticValidation
 metadata:
-  name: service-validation
-data:
-  endpoint-check.rego: |
-    package kubeasy.challenge
-
-    violation[{"msg": msg}] {
-      input.kind == "Service"
-      input.metadata.name == "api-service"
-      selector := input.spec.selector
-      selector.app != "api-service"
-      msg := "Service selector may not match deployment labels"
-    }
+  name: check-deployment-probes
+spec:
+  target:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api-service
+  rulesConfigMap:
+    name: check-probes

@@ -5,21 +5,52 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sync"
+	"time"
+)
+
+var (
+	isReady bool
+	mu      sync.RWMutex
 )
 
 func main() {
+	log.Println("Starting notify-service initialization...")
+	log.Println("Loading configuration and connecting to dependencies...")
+
+	// Simulate slow startup (loading config, connecting to database, etc.)
+	go func() {
+		time.Sleep(15 * time.Second)
+		mu.Lock()
+		isReady = true
+		mu.Unlock()
+		log.Println("Service is now ready to accept traffic")
+	}()
+
 	log.Println("Available routes:")
-	log.Println("  GET /healthz/live → Liveness probe")
-	log.Println("  GET /healthz/ready → Readiness probe")
+	log.Println("  GET /health/live → Liveness probe")
+	log.Println("  GET /health/ready → Readiness probe")
 	log.Println("  GET / → Welcome message")
 	log.Println("  POST /notify → Send a notification")
 
-	http.HandleFunc("/healthz/live", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/health/live", func(w http.ResponseWriter, r *http.Request) {
+		// Liveness should always pass once the server is running
+		w.WriteHeader(http.StatusOK)
 		fmt.Fprintln(w, "OK")
 	})
 
-	http.HandleFunc("/healthz/ready", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Ready")
+	http.HandleFunc("/health/ready", func(w http.ResponseWriter, r *http.Request) {
+		mu.RLock()
+		ready := isReady
+		mu.RUnlock()
+
+		if ready {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprintln(w, "Ready")
+		} else {
+			w.WriteHeader(http.StatusServiceUnavailable)
+			fmt.Fprintln(w, "Not ready yet")
+		}
 	})
 
 	http.HandleFunc("/notify", func(w http.ResponseWriter, r *http.Request) {
