@@ -1,15 +1,11 @@
-apiVersion: v1
-kind: ConfigMap
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: StaticValidation
 metadata:
-  name: storage-validation
-data:
-  pvc-storageclass.rego: |
-    package kubeasy.challenge
-
-    violation[{"msg": msg}] {
-      input.kind == "PersistentVolumeClaim"
-      input.metadata.name == "postgres-data"
-      sc := input.spec.storageClassName
-      sc == "fast-ssd"
-      msg := sprintf("StorageClass '%s' referenced in PVC may not be available", [sc])
-    }
+  name: check-statefulset-config
+spec:
+  target:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: postgres-db
+  rulesConfigMap:
+    name: check-statefulset

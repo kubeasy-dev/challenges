@@ -3,9 +3,10 @@ kind: Service
 metadata:
   name: postgres-service
 spec:
+  clusterIP: None  # Headless service for StatefulSet
   selector:
     app: postgres-db
   ports:
     - port: 5432
       targetPort: 5432
-  type: ClusterIP
+      name: postgres

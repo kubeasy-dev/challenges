@@ -1,9 +1,0 @@
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: standard-ssd
-provisioner: rancher.io/local-path
-parameters:
-  type: pd-ssd
-  replication-type: none
-allowVolumeExpansion: true
