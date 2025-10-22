@@ -1,12 +1,11 @@
 {
   "name": "challenges-sync",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "main": "sync.js",
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Kubeasy challenge synchronization tool - syncs challenges to the API",
   "dependencies": {
-    "@supabase/supabase-js": "^2.49.8",
     "js-yaml": "^4.1.0",
     "@octokit/rest": "^20.1.1"
   }
