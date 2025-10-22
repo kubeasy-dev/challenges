@@ -3,7 +3,7 @@ description: |
   The nightly data processing job has been failing for the past week.
   It used to work fine, but now it times out and gets killed by Kubernetes.
 theme: jobs-cronjobs
-difficulty: intermediate
+difficulty: medium
 estimated_time: 15
 initial_situation: |
   A CronJob that processes data every night has been consistently failing.

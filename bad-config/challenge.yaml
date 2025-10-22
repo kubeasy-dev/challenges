@@ -1,13 +1,15 @@
 title: Bad Config
 description: |
-  The web application keeps crashing on startup. The deployment looks fine, 
-  but something in the configuration is wrong.
+  The configuration was updated hours ago, but nothing changed.
+  The pods are living in the past.
 theme: pods-containers
-difficulty: beginner
-estimated_time: 10
+difficulty: easy
+estimated_time: 15
 initial_situation: |
-  A web application was deployed this morning, but something went wrong during startup.
-  The deployment completed without errors, yet the pods keep failing.
+  A web application is deployed with its configuration in a ConfigMap.
+  The team updated the ConfigMap to enable a new feature flag.
+  Checking the ConfigMap shows the new values are definitely there.
+  But the running application still uses the old configuration - as if the change never happened.
 objective: |
-  Get the application running and stable. 
-  Investigate what's preventing the normal startup sequence.
+  Make sure configuration changes actually reach the running application.
+  Future config updates shouldn't silently fail like this.

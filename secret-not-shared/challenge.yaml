@@ -1,0 +1,16 @@
+title: Secret Not Shared
+description: |
+  A microservice can't connect to the database because it's missing credentials.
+  The Secret exists, but the pod doesn't have access to it.
+theme: volumes-secrets
+difficulty: medium
+estimated_time: 20
+initial_situation: |
+  A new microservice was deployed that needs to connect to a PostgreSQL database.
+  The database credentials are stored in a Kubernetes Secret.
+  The Secret exists and contains the correct username and password.
+  However, the pod fails to start with an error: "DATABASE_PASSWORD environment variable not set".
+  The deployment manifest has a reference to the Secret, but something is wrong with the configuration.
+objective: |
+  Fix the deployment configuration so the pod can access the database credentials from the Secret.
+  The application expects credentials as environment variables: DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD.

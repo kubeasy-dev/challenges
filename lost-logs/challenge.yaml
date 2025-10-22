@@ -1,0 +1,16 @@
+title: Lost Logs
+description: |
+  The application is running, but logs are missing when trying to debug issues.
+  Some containers show logs, others don't.
+theme: monitoring-debugging
+difficulty: easy
+estimated_time: 15
+initial_situation: |
+  A multi-container pod is deployed with a main application and a sidecar logger.
+  The main application runs fine and you can see its logs with kubectl logs.
+  However, the sidecar container writes logs to a file (/var/log/app.log) instead of stdout.
+  When you try to check the sidecar logs with kubectl logs, nothing appears.
+  This makes debugging issues with the logging system impossible.
+objective: |
+  Fix the logging configuration so all container logs are visible via kubectl logs.
+  Ensure logs are written to stdout/stderr following 12-factor app principles.

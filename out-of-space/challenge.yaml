@@ -1,14 +1,15 @@
 title: Out of Space
 description: |
-  The database pod was working fine until this morning. Now it won't start.
-  The logs mention something about mounting volumes, but the PVC shows as Bound.
+  Scaling worked... partially. One pod is happy, the others are stuck.
+  They all want the same thing, but apparently they can't all have it.
 theme: volumes-secrets
-difficulty: intermediate
-estimated_time: 15
+difficulty: medium
+estimated_time: 20
 initial_situation: |
-  A PostgreSQL database was deployed with persistent storage yesterday and was working normally.
-  This morning, the pod started crash-looping with mount-related errors.
-  The PersistentVolumeClaim appears to be bound, but something is preventing the pod from starting.
+  A PostgreSQL StatefulSet was running fine with a single replica.
+  To improve availability, the team scaled it to 3 replicas.
+  The first pod is Running normally, but pods 2 and 3 are stuck in Pending.
+  The events mention something about volumes, but all PersistentVolumeClaims show as Bound.
 objective: |
-  Get the database pod running again by resolving the storage mounting issue.
-  The data must remain intact - do not recreate the PVC or lose existing data.
+  Figure out why scaling breaks the deployment and get things working again.
+  Not every problem is solved by throwing more replicas at it.
