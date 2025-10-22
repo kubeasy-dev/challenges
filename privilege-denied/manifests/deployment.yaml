@@ -12,13 +12,6 @@ spec:
       labels:
         app: legacy-app
     spec:
-      # PROBLEM 1: No securityContext defined
-      # The pod will try to run as root (uid 0)
-      # securityContext:
-      #   runAsNonRoot: true
-      #   runAsUser: 1000
-      #   fsGroup: 1000
-
       containers:
         - name: app
           image: python:3.11-slim
@@ -31,8 +24,6 @@ spec:
               echo "=========================================="
               echo "Current user: $(whoami) (uid: $(id -u))"
 
-              # PROBLEM 2: Trying to write to root filesystem
-              # This will fail with readOnlyRootFilesystem: true
               echo "Attempting to write to /tmp..."
               echo "test" > /tmp/test.txt
 
@@ -40,19 +31,7 @@ spec:
               echo "Starting web server on port 8080..."
               echo "=========================================="
 
-              # Keep running
               python3 -m http.server 8080
-
-          # PROBLEM 3: No container-level securityContext
-          # Missing: runAsNonRoot, readOnlyRootFilesystem, allowPrivilegeEscalation
-          # securityContext:
-          #   runAsNonRoot: true
-          #   runAsUser: 1000
-          #   allowPrivilegeEscalation: false
-          #   readOnlyRootFilesystem: true
-          #   capabilities:
-          #     drop:
-          #       - ALL
 
           ports:
             - containerPort: 8080

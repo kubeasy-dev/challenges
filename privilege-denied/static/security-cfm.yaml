@@ -6,19 +6,16 @@ data:
   pod-security-context.rego: |
     package kubeasy.challenge
 
-    # Check that pod-level securityContext has runAsNonRoot
     violation[{"msg": msg}] {
       not input.spec.template.spec.securityContext.runAsNonRoot
       msg := "Pod securityContext must set runAsNonRoot: true to prevent running as root"
     }
 
-    # Check that pod-level securityContext has runAsUser set to non-root
     violation[{"msg": msg}] {
       not input.spec.template.spec.securityContext.runAsUser
       msg := "Pod securityContext must set runAsUser to a non-root UID (e.g., 1000)"
     }
 
-    # Check that runAsUser is not 0 (root)
     violation[{"msg": msg}] {
       input.spec.template.spec.securityContext.runAsUser == 0
       msg := "Pod securityContext runAsUser cannot be 0 (root). Use a non-root UID like 1000"
@@ -27,14 +24,12 @@ data:
   container-security-context.rego: |
     package kubeasy.challenge
 
-    # Check that container has securityContext
     violation[{"msg": msg}] {
       container := input.spec.template.spec.containers[_]
       not container.securityContext
       msg := sprintf("Container '%s' must have a securityContext defined", [container.name])
     }
 
-    # Check that container has allowPrivilegeEscalation: false
     violation[{"msg": msg}] {
       container := input.spec.template.spec.containers[_]
       container.securityContext
@@ -42,7 +37,6 @@ data:
       msg := sprintf("Container '%s' must set allowPrivilegeEscalation: false", [container.name])
     }
 
-    # Check that container has readOnlyRootFilesystem: true
     violation[{"msg": msg}] {
       container := input.spec.template.spec.containers[_]
       container.securityContext
@@ -50,7 +44,6 @@ data:
       msg := sprintf("Container '%s' must set readOnlyRootFilesystem: true", [container.name])
     }
 
-    # Check that container has runAsNonRoot: true
     violation[{"msg": msg}] {
       container := input.spec.template.spec.containers[_]
       container.securityContext
@@ -61,7 +54,6 @@ data:
   capabilities.rego: |
     package kubeasy.challenge
 
-    # Check that all capabilities are dropped
     violation[{"msg": msg}] {
       container := input.spec.template.spec.containers[_]
       container.securityContext

@@ -6,8 +6,6 @@ data:
   memory-limits-check.rego: |
     package kubeasy.challenge
 
-    # Check that memory limit is sufficient (at least 100Mi for data processor)
-    # The broken deployment has 50Mi which is too low
     violation[{"msg": msg}] {
       container := input.spec.template.spec.containers[_]
       container.resources.limits.memory == "50Mi"
@@ -17,7 +15,6 @@ data:
   memory-requests-check.rego: |
     package kubeasy.challenge
 
-    # Check that memory request is sufficient
     violation[{"msg": msg}] {
       container := input.spec.template.spec.containers[_]
       container.resources.requests.memory == "32Mi"

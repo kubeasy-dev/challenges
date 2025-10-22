@@ -24,7 +24,6 @@ spec:
               echo "=========================================="
               echo "Checking database configuration..."
 
-              # Check if required environment variables are set
               if [ -z "$DATABASE_HOST" ]; then
                 echo "ERROR: DATABASE_HOST environment variable not set!"
                 exit 1
@@ -48,16 +47,12 @@ spec:
               echo "Starting API server on port 8080..."
               echo "=========================================="
 
-              # Simulate API service running
               python3 -m http.server 8080
           ports:
             - containerPort: 8080
-          # PROBLEM: Secret reference is missing or incorrectly configured
-          # The Secret exists but the env variables are not defined
           env:
             - name: DATABASE_HOST
-              value: "wrong-host.example.com"  # Hardcoded wrong value
-            # DATABASE_USER and DATABASE_PASSWORD are missing!
+              value: "wrong-host.example.com"
           resources:
             requests:
               cpu: "50m"

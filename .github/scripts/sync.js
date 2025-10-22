@@ -3,22 +3,12 @@ const path = require("path");
 const yaml = require("js-yaml");
 const { validateChallenge } = require("./validation");
 
-const mode = process.argv[2] || "sync";
-
-if (!["sync", "validate"].includes(mode)) {
-  console.error(`Invalid mode: ${mode}. Use 'sync' or 'validate'.`);
-  console.error("Usage:");
-  console.error("  node sync.js sync       - Sync all challenges to the API");
-  console.error("  node sync.js validate   - Only validate challenges without syncing");
-  process.exit(1);
-}
-
 // API configuration
-const API_URL = process.env.API_URL || "https://kubeasy.dev";
+const API_URL = process.env.API_URL
 const API_TOKEN = process.env.API_TOKEN;
 
-if (mode === "sync" && !API_TOKEN) {
-  console.error("Missing API_TOKEN env variable (required for sync mode)");
+if (!API_TOKEN) {
+  console.error("Missing API_TOKEN env variable");
   console.error("Set your admin API token: export API_TOKEN=your_token_here");
   process.exit(1);
 }
@@ -92,7 +82,7 @@ async function loadChallenge(folder) {
  * Syncs all challenges to the API using the bulk sync endpoint
  */
 async function syncChallenges(challenges) {
-  const endpoint = `${API_URL}/api/admin/challenges/sync`;
+  const endpoint = `${API_URL}/challenges/sync`;
 
   console.log(`\n📡 Sending ${challenges.length} challenges to ${endpoint}...`);
 
@@ -126,7 +116,6 @@ async function syncChallenges(challenges) {
  */
 async function main() {
   console.log(`🚀 Kubeasy Challenge Sync Tool`);
-  console.log(`   Mode: ${mode}`);
   console.log(`   API: ${API_URL}\n`);
 
   // Find all challenge folders
@@ -163,11 +152,6 @@ async function main() {
     console.error(`\n❌ Cannot proceed with sync due to validation errors.`);
     console.error(`   Fix the errors above and try again.`);
     process.exit(1);
-  }
-
-  if (mode === "validate") {
-    console.log(`\n🎉 All challenges are valid!`);
-    process.exit(0);
   }
 
   // Sync to API

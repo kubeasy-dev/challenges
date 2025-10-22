@@ -13,7 +13,6 @@ spec:
         app: web-app
     spec:
       containers:
-        # Main application container - logs to stdout (GOOD)
         - name: app
           image: python:3.11-slim
           command: ["/bin/sh"]
@@ -36,15 +35,12 @@ spec:
               cpu: "100m"
               memory: "128Mi"
 
-        # Sidecar logger container - logs to FILE (PROBLEM)
         - name: logger
           image: python:3.11-slim
           command: ["/bin/sh"]
           args:
             - "-c"
             - |
-              # PROBLEM: Writing logs to a file instead of stdout
-              # Kubernetes can only capture stdout/stderr
               mkdir -p /var/log
 
               while true; do

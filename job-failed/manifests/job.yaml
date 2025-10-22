@@ -1,10 +1,8 @@
-# Manual job for testing purposes
 apiVersion: batch/v1
 kind: Job
 metadata:
   name: data-processor-manual
 spec:
-  # Same issue as CronJob - timeout too short
   activeDeadlineSeconds: 30
   template:
     spec:

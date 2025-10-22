@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: data-processor
 spec:
-  schedule: "0 2 * * *"  # Daily at 2 AM
+  schedule: "0 2 * * *"
   jobTemplate:
     spec:
       activeDeadlineSeconds: 30
@@ -14,11 +14,10 @@ spec:
             - name: processor
               image: busybox:latest
               command: ["/bin/sh"]
-              args: 
+              args:
                 - -c
                 - |
                   echo "Starting data processing..."
-                  # Simulate a processing job that takes ~60 seconds
                   for i in $(seq 1 12); do
                     echo "Processing batch $i/12"
                     sleep 5
