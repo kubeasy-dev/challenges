@@ -90,6 +90,21 @@ npm install
 node validate-challenges.js "your-challenge-folder"
 ```
 
+## Solutions
+
+**⚠️ IMPORTANT: Challenge solutions are NOT stored in this repository.**
+
+Solutions (SOLUTION.md files) are maintained in a separate **private repository** to prevent spoilers and maintain the learning experience for users.
+
+If you're a maintainer and need access to solutions:
+- Contact the project administrators
+- Solutions repo is private and not linked publicly
+
+When contributing a new challenge:
+- Write the solution in the private solutions repository
+- **Never commit SOLUTION.md files to this public repo**
+- Add SOLUTION.md to .gitignore (already configured)
+
 ## Scripts
 
 All automation scripts are located in `.github/scripts/`. See the [scripts README](.github/scripts/README.md) for more details.
