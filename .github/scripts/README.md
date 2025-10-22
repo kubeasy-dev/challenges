@@ -41,29 +41,28 @@ node validate-challenges.js '["access-pending", "partial-outage"]'
 ```
 
 ### 🔄 sync.js
-**Purpose**: Synchronizes challenge data with Supabase database
+**Purpose**: Synchronizes all challenges with the Kubeasy API
 
 **Features**:
+- Automatically scans for all challenge folders
 - Uses validation module to ensure data quality before sync
-- Upserts challenge data to Supabase
-- Supports batch operations and conflict resolution
+- Bulk sync operation using the admin API endpoint
+- Supports create, update, and delete operations in a single call
 - Provides detailed operation reports
+- Validate-only mode for CI/CD checks
 
 **Usage**:
 ```bash
-# Sync a single challenge
-node sync.js "access-pending"
+# Sync all challenges to the API
+node sync.js sync
 
-# Sync multiple challenges
-node sync.js "access-pending partial-outage"
-
-# Delete challenges from database
-node sync.js "old-challenge" delete
+# Only validate challenges without syncing
+node sync.js validate
 ```
 
 **Environment Variables**:
-- `SUPABASE_URL`: Your Supabase project URL
-- `SUPABASE_ANON_KEY`: Your Supabase anonymous key
+- `API_URL`: The Kubeasy API URL (default: https://kubeasy.dev)
+- `API_TOKEN`: Admin API token (required for sync mode)
 
 ### 🏷️ create-github-resources.js
 **Purpose**: Creates GitHub labels and discussions for new challenges
@@ -117,10 +116,11 @@ Challenges must conform to the following schema:
 title: string (required, max 255 chars)
 description: string (required)
 theme: string (required)
-difficulty: enum (required, "beginner"|"intermediate"|"advanced")
+difficulty: enum (required, "easy"|"medium"|"hard")
 estimated_time: number (required, min 1 minute)
-initial_situation: string (optional)
-objective: string (optional)
+initial_situation: string (required)
+objective: string (required)
+of_the_week: boolean (optional, default: false)
 ```
 
 ## Quality Checks
