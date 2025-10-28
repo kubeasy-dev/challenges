@@ -16,7 +16,7 @@ jobs:
   images:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.changed-files.outputs.all_changed_files }}
+      matrix: ${{ steps.filter-challenges.outputs.matrix }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -27,22 +27,51 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v46
         with:
-          since_last_remote_commit: true 
+          since_last_remote_commit: true
           dir_names: true
           dir_names_max_depth: 1
           matrix: true
 
+      - name: Filter challenges with images
+        id: filter-challenges
+        run: |
+          # Get the changed directories
+          changed_dirs='${{ steps.changed-files.outputs.all_changed_files }}'
+          echo "Raw changed directories: $changed_dirs"
+
+          # Convert JSON array to bash array and filter
+          filtered_dirs='[]'
+          for dir in $(echo "$changed_dirs" | jq -r '.[]'); do
+            # Skip .github directory
+            if [[ "$dir" == ".github" ]]; then
+              echo "Skipping .github directory"
+              continue
+            fi
+
+            # Check if image directory exists
+            if [[ -d "$dir/image" ]]; then
+              echo "Found image directory in $dir"
+              filtered_dirs=$(echo "$filtered_dirs" | jq -c ". += [\"$dir\"]")
+            else
+              echo "No image directory in $dir, skipping"
+            fi
+          done
+
+          echo "Filtered challenges: $filtered_dirs"
+          echo "matrix=$filtered_dirs" >> $GITHUB_OUTPUT
+
       - name: Debug
         run: |
-          echo "Changed challenges: ${{ steps.changed-files.outputs.all_changed_files }}"
+          echo "Changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
+          echo "Filtered challenges: ${{ steps.filter-challenges.outputs.matrix }}"
 
   build-and-push:
     runs-on: ubuntu-latest
     needs: images
     strategy:
       matrix:
-        image: ${{ fromJson(needs.images.outputs.matrix) }} 
-    if: ${{ needs.images.outputs.matrix != '[]' }}
+        image: ${{ fromJson(needs.images.outputs.matrix) }}
+    if: ${{ needs.images.outputs.matrix != '[]' && needs.images.outputs.matrix != '' }}
     steps: 
       - name: Checkout code
         uses: actions/checkout@v4
