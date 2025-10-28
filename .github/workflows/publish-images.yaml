@@ -25,6 +25,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
+        if: github.event_name != 'workflow_dispatch'
         uses: tj-actions/changed-files@v46
         with:
           since_last_remote_commit: true
@@ -35,27 +36,50 @@ jobs:
       - name: Filter challenges with images
         id: filter-challenges
         run: |
-          # Get the changed directories
-          changed_dirs='${{ steps.changed-files.outputs.all_changed_files }}'
-          echo "Raw changed directories: $changed_dirs"
+          # For manual workflow_dispatch, build all images
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "Manual trigger detected - building all images"
+            filtered_dirs='[]'
 
-          # Convert JSON array to bash array and filter
-          filtered_dirs='[]'
-          for dir in $(echo "$changed_dirs" | jq -r '.[]'); do
-            # Skip .github directory
-            if [[ "$dir" == ".github" ]]; then
-              echo "Skipping .github directory"
-              continue
-            fi
+            # Find all directories containing an image/ subdirectory
+            for dir in */; do
+              dir=${dir%/}  # Remove trailing slash
 
-            # Check if image directory exists
-            if [[ -d "$dir/image" ]]; then
-              echo "Found image directory in $dir"
-              filtered_dirs=$(echo "$filtered_dirs" | jq -c ". += [\"$dir\"]")
-            else
-              echo "No image directory in $dir, skipping"
-            fi
-          done
+              # Skip .github directory
+              if [[ "$dir" == ".github" ]]; then
+                continue
+              fi
+
+              # Check if image directory exists
+              if [[ -d "$dir/image" ]]; then
+                echo "Found image directory in $dir"
+                filtered_dirs=$(echo "$filtered_dirs" | jq -c ". += [\"$dir\"]")
+              fi
+            done
+          else
+            # For push events, only build changed images
+            echo "Push event detected - building only changed images"
+            changed_dirs='${{ steps.changed-files.outputs.all_changed_files }}'
+            echo "Raw changed directories: $changed_dirs"
+
+            # Convert JSON array to bash array and filter
+            filtered_dirs='[]'
+            for dir in $(echo "$changed_dirs" | jq -r '.[]'); do
+              # Skip .github directory
+              if [[ "$dir" == ".github" ]]; then
+                echo "Skipping .github directory"
+                continue
+              fi
+
+              # Check if image directory exists
+              if [[ -d "$dir/image" ]]; then
+                echo "Found image directory in $dir"
+                filtered_dirs=$(echo "$filtered_dirs" | jq -c ". += [\"$dir\"]")
+              else
+                echo "No image directory in $dir, skipping"
+              fi
+            done
+          fi
 
           echo "Filtered challenges: $filtered_dirs"
           echo "matrix=$filtered_dirs" >> $GITHUB_OUTPUT
