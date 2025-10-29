@@ -3,7 +3,7 @@ kind: LogValidation
 metadata:
   name: check-logger-stdout
 spec:
-  targetRef:
+  target:
     kind: Pod
     labelSelector:
       matchLabels:
@@ -11,5 +11,5 @@ spec:
   expectedStrings:
     - "Application log entry"
     - "Logger sidecar"
-  containerName: logger
+  container: logger
   sinceSeconds: 60

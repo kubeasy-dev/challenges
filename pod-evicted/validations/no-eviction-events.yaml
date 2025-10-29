@@ -3,7 +3,7 @@ kind: EventValidation
 metadata:
   name: no-oom-eviction
 spec:
-  targetRef:
+  target:
     kind: Pod
     labelSelector:
       matchLabels:

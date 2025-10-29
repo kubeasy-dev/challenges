@@ -3,7 +3,7 @@ kind: LogValidation
 metadata:
   name: database-connection-check
 spec:
-  targetRef:
+  target:
     kind: Pod
     labelSelector:
       matchLabels:

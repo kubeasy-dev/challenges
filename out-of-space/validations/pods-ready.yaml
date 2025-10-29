@@ -3,7 +3,7 @@ kind: StatusValidation
 metadata:
   name: all-postgres-pods-ready
 spec:
-  targetRef:
+  target:
     kind: Pod
     labelSelector:
       matchLabels:

@@ -3,7 +3,7 @@ kind: EventValidation
 metadata:
   name: no-security-violations
 spec:
-  targetRef:
+  target:
     kind: Pod
     labelSelector:
       matchLabels:

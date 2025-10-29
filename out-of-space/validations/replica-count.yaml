@@ -3,7 +3,7 @@ kind: MetricsValidation
 metadata:
   name: statefulset-replicas-check
 spec:
-  targetRef:
+  target:
     kind: StatefulSet
     name: postgres
   metricChecks:

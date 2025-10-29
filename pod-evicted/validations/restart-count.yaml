@@ -3,7 +3,7 @@ kind: MetricsValidation
 metadata:
   name: low-restart-count
 spec:
-  targetRef:
+  target:
     kind: Pod
     labelSelector:
       matchLabels:

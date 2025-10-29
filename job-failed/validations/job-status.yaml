@@ -3,7 +3,7 @@ kind: StatusValidation
 metadata:
   name: job-completion-check
 spec:
-  targetRef:
+  target:
     kind: Job
     labelSelector:
       matchLabels:

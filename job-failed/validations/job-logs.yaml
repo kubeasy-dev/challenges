@@ -3,12 +3,12 @@ kind: LogValidation
 metadata:
   name: job-logs-check
 spec:
-  targetRef:
+  target:
     kind: Pod
     labelSelector:
       matchLabels:
         job-name: data-processor
   expectedStrings:
     - "Data processing completed successfully!"
-  containerName: processor
+  container: processor
   sinceSeconds: 300

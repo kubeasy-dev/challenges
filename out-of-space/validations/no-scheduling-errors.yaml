@@ -3,7 +3,7 @@ kind: EventValidation
 metadata:
   name: no-volume-errors
 spec:
-  targetRef:
+  target:
     kind: Pod
     labelSelector:
       matchLabels:

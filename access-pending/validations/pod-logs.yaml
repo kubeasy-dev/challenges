@@ -3,12 +3,12 @@ kind: LogValidation
 metadata:
   name: pod-logs-check
 spec:
-  targetRef:
+  target:
     kind: Pod
     labelSelector:
       matchLabels:
         app: startup-app
   expectedStrings:
     - "✅ Access OK"
-  containerName: startup-app
+  container: startup-app
   sinceSeconds: 120

@@ -3,7 +3,7 @@ kind: StatusValidation
 metadata:
   name: pods-ready-check
 spec:
-  targetRef:
+  target:
     kind: Pod
     labelSelector:
       matchLabels:
