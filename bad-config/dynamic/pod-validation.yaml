@@ -17,4 +17,4 @@ spec:
     - kind: logs
       logCheck:
         container: app
-        expectedString: "Config validated"
+        expectedString: "Configuration loaded successfully!"

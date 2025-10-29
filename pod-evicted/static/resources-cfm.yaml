@@ -6,17 +6,53 @@ data:
   memory-limits-check.rego: |
     package kubeasy.challenge
 
+    import future.keywords.in
+
+    # Helper function to convert memory string to Mi
+    memory_to_mi(mem_str) = result {
+      endswith(mem_str, "Mi")
+      result := to_number(trim_suffix(mem_str, "Mi"))
+    } else = result {
+      endswith(mem_str, "Gi")
+      result := to_number(trim_suffix(mem_str, "Gi")) * 1024
+    } else = result {
+      endswith(mem_str, "M")
+      result := to_number(trim_suffix(mem_str, "M"))
+    } else = result {
+      endswith(mem_str, "G")
+      result := to_number(trim_suffix(mem_str, "G")) * 1024
+    }
+
     violation[{"msg": msg}] {
       container := input.spec.template.spec.containers[_]
-      container.resources.limits.memory == "50Mi"
-      msg := "Memory limit is too low (50Mi). The application needs at least 100Mi to run without OOMKilled errors"
+      limit := memory_to_mi(container.resources.limits.memory)
+      limit < 100
+      msg := sprintf("Memory limit is too low (%vMi). The application needs at least 100Mi to run without OOMKilled errors", [limit])
     }
 
   memory-requests-check.rego: |
     package kubeasy.challenge
 
+    import future.keywords.in
+
+    # Helper function to convert memory string to Mi
+    memory_to_mi(mem_str) = result {
+      endswith(mem_str, "Mi")
+      result := to_number(trim_suffix(mem_str, "Mi"))
+    } else = result {
+      endswith(mem_str, "Gi")
+      result := to_number(trim_suffix(mem_str, "Gi")) * 1024
+    } else = result {
+      endswith(mem_str, "M")
+      result := to_number(trim_suffix(mem_str, "M"))
+    } else = result {
+      endswith(mem_str, "G")
+      result := to_number(trim_suffix(mem_str, "G")) * 1024
+    }
+
     violation[{"msg": msg}] {
       container := input.spec.template.spec.containers[_]
-      container.resources.requests.memory == "32Mi"
-      msg := "Memory request should be increased to at least 64Mi for stable operation"
+      request := memory_to_mi(container.resources.requests.memory)
+      request < 64
+      msg := sprintf("Memory request should be increased to at least 64Mi for stable operation (current: %vMi)", [request])
     }
