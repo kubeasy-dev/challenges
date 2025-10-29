@@ -1,0 +1,13 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: LogValidation
+metadata:
+  name: frontend-logs-check
+spec:
+  targetRef:
+    kind: Pod
+    labelSelector:
+      matchLabels:
+        app: frontend
+  expectedStrings:
+    - "✅ Connected to backend"
+  sinceSeconds: 120

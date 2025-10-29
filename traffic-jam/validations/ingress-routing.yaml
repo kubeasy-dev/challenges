@@ -1,0 +1,16 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: ConnectivityValidation
+metadata:
+  name: ingress-routing-check
+spec:
+  sourcePodRef:
+    kind: Pod
+    labelSelector:
+      matchLabels:
+        app: api
+  targets:
+    - url: "http://ingress-nginx-controller.ingress-nginx.svc.cluster.local"
+      headers:
+        Host: "api.local"
+      expectedStatusCode: 200
+      timeoutSeconds: 5

@@ -1,0 +1,15 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: EventValidation
+metadata:
+  name: no-oom-eviction
+spec:
+  targetRef:
+    kind: Pod
+    labelSelector:
+      matchLabels:
+        app: data-processor
+  forbiddenEventReasons:
+    - "Evicted"
+    - "OOMKilled"
+    - "FailedScheduling"
+  sinceSeconds: 300

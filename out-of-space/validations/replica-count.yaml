@@ -1,0 +1,15 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: MetricsValidation
+metadata:
+  name: statefulset-replicas-check
+spec:
+  targetRef:
+    kind: StatefulSet
+    name: postgres
+  metricChecks:
+    - metric: readyReplicas
+      operator: Equals
+      value: 3
+    - metric: availableReplicas
+      operator: Equals
+      value: 3

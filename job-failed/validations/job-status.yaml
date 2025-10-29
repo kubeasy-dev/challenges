@@ -1,0 +1,13 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: StatusValidation
+metadata:
+  name: job-completion-check
+spec:
+  targetRef:
+    kind: Job
+    labelSelector:
+      matchLabels:
+        job-name: data-processor
+  expectedConditions:
+    - type: "Complete"
+      status: "True"

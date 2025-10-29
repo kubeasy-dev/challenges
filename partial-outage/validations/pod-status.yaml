@@ -1,0 +1,13 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: StatusValidation
+metadata:
+  name: frontend-ready-check
+spec:
+  targetRef:
+    kind: Pod
+    labelSelector:
+      matchLabels:
+        app: frontend
+  expectedConditions:
+    - type: "Ready"
+      status: "True"

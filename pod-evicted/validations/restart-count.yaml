@@ -1,0 +1,14 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: MetricsValidation
+metadata:
+  name: low-restart-count
+spec:
+  targetRef:
+    kind: Pod
+    labelSelector:
+      matchLabels:
+        app: data-processor
+  metricChecks:
+    - metric: restartCount
+      operator: LessThan
+      value: 3

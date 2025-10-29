@@ -1,0 +1,14 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: LogValidation
+metadata:
+  name: pod-logs-check
+spec:
+  targetRef:
+    kind: Pod
+    labelSelector:
+      matchLabels:
+        app: startup-app
+  expectedStrings:
+    - "✅ Access OK"
+  containerName: startup-app
+  sinceSeconds: 120

@@ -25,9 +25,23 @@ Each challenge folder contains:
 - `challenge.yaml` - Challenge metadata and description
 - `manifests/` - Kubernetes manifests for the challenge
 - `image/` - Custom Docker images (if needed)
-- `policies/` - Admission controller policies
-- `static/` - Static validation files
-- `dynamic/` - Dynamic challenge components
+- `policies/` - Kyverno admission controller policies
+- `validations/` - **NEW**: Specialized validation CRDs (LogValidation, StatusValidation, etc.)
+- `static/` - **DEPRECATED**: Legacy static validation files (being phased out)
+- `dynamic/` - **DEPRECATED**: Legacy dynamic validation files (being phased out)
+
+### New Validation System
+
+As of October 2025, challenges use specialized validation CRDs instead of generic static/dynamic validations:
+
+- **LogValidation** - Validates container logs contain expected strings
+- **StatusValidation** - Checks resource status conditions (Pod Ready, Deployment Available, etc.)
+- **EventValidation** - Detects forbidden Kubernetes events (BackOff, Evicted, OOMKilled, etc.)
+- **MetricsValidation** - Verifies pod/deployment metrics (restart count, replicas, etc.)
+- **RBACValidation** - Tests ServiceAccount permissions using SubjectAccessReview
+- **ConnectivityValidation** - Validates network connectivity between pods
+
+See [MIGRATION_SUMMARY.md](./MIGRATION_SUMMARY.md) for complete migration details and examples.
 
 ## Challenge Metadata
 

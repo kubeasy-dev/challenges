@@ -1,0 +1,15 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: LogValidation
+metadata:
+  name: check-logger-stdout
+spec:
+  targetRef:
+    kind: Pod
+    labelSelector:
+      matchLabels:
+        app: web-app
+  expectedStrings:
+    - "Application log entry"
+    - "Logger sidecar"
+  containerName: logger
+  sinceSeconds: 60

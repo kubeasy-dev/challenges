@@ -1,0 +1,15 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: EventValidation
+metadata:
+  name: no-volume-errors
+spec:
+  targetRef:
+    kind: Pod
+    labelSelector:
+      matchLabels:
+        app: postgres
+  forbiddenEventReasons:
+    - "FailedScheduling"
+    - "FailedAttachVolume"
+    - "FailedMount"
+  sinceSeconds: 300

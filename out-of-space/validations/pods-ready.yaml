@@ -1,0 +1,13 @@
+apiVersion: challenge.kubeasy.dev/v1alpha1
+kind: StatusValidation
+metadata:
+  name: all-postgres-pods-ready
+spec:
+  targetRef:
+    kind: Pod
+    labelSelector:
+      matchLabels:
+        app: postgres
+  expectedConditions:
+    - type: "Ready"
+      status: "True"
