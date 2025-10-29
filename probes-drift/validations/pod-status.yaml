@@ -4,6 +4,7 @@ metadata:
   name: app-ready-check
 spec:
   target:
+    apiVersion: v1
     kind: Pod
     labelSelector:
       matchLabels:

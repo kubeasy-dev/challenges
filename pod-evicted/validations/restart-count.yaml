@@ -4,6 +4,7 @@ metadata:
   name: low-restart-count
 spec:
   target:
+    apiVersion: v1
     kind: Pod
     labelSelector:
       matchLabels:

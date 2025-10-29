@@ -4,6 +4,7 @@ metadata:
   name: no-security-violations
 spec:
   target:
+    apiVersion: v1
     kind: Pod
     labelSelector:
       matchLabels:

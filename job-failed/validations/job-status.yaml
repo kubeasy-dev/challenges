@@ -4,6 +4,7 @@ metadata:
   name: job-completion-check
 spec:
   target:
+    apiVersion: batch/v1
     kind: Job
     labelSelector:
       matchLabels:

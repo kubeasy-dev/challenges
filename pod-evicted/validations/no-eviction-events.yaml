@@ -4,6 +4,7 @@ metadata:
   name: no-oom-eviction
 spec:
   target:
+    apiVersion: v1
     kind: Pod
     labelSelector:
       matchLabels:

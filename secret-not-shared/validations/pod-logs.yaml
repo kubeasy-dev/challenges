@@ -4,6 +4,7 @@ metadata:
   name: database-connection-check
 spec:
   target:
+    apiVersion: v1
     kind: Pod
     labelSelector:
       matchLabels:

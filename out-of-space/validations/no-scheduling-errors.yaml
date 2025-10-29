@@ -4,6 +4,7 @@ metadata:
   name: no-volume-errors
 spec:
   target:
+    apiVersion: v1
     kind: Pod
     labelSelector:
       matchLabels:

@@ -4,6 +4,7 @@ metadata:
   name: all-postgres-pods-ready
 spec:
   target:
+    apiVersion: v1
     kind: Pod
     labelSelector:
       matchLabels:

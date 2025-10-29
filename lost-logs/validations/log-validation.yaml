@@ -4,6 +4,7 @@ metadata:
   name: check-logger-stdout
 spec:
   target:
+    apiVersion: v1
     kind: Pod
     labelSelector:
       matchLabels:

@@ -4,6 +4,7 @@ metadata:
   name: job-logs-check
 spec:
   target:
+    apiVersion: v1
     kind: Pod
     labelSelector:
       matchLabels:
