@@ -8,7 +8,7 @@ spec:
     kind: Pod
     labelSelector:
       matchLabels:
-        app: probes-app
-  expectedConditions:
+        app: notify-service
+  conditions:
     - type: "Ready"
       status: "True"
