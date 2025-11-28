@@ -43,7 +43,7 @@ function findAllChallenges() {
 }
 
 /**
- * Converts a CRD name to a human-readable title
+ * Converts a validation key to a human-readable title
  * e.g., "app-ready-check" -> "App Ready Check"
  */
 function formatDisplayName(name) {
