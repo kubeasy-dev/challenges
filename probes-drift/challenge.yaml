@@ -10,3 +10,18 @@ initial_situation: |
 objective: |
   Stop the crash loop and get the service running.
   The app is fine - something about how Kubernetes checks its health isn't right.
+
+validations:
+  - key: app-ready-check
+    title: "Pod Ready Check"
+    description: "The notify-service pod must be in Ready state with healthy liveness and readiness probes"
+    order: 1
+    type: status
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: notify-service
+      conditions:
+        - type: Ready
+          status: "True"

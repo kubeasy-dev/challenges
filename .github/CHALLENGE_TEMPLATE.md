@@ -1,116 +1,185 @@
 # Challenge Template
 
-Use this template to create new challenges for the Kubeasy platform.
+Use this template to create new challenges for Kubeasy.
 
-## 📁 Folder Structure
+## Folder Structure
 
 ```
 your-challenge-name/
-├── challenge.yaml          # Required: Challenge metadata
-├── manifests/             # Recommended: Kubernetes manifests
+├── challenge.yaml      # Required: metadata + validations
+├── manifests/          # Required: broken K8s manifests
 │   ├── deployment.yaml
 │   ├── service.yaml
 │   └── ...
-├── image/                 # Optional: Custom Docker images
-│   ├── Dockerfile
-│   └── ...
-├── policies/              # Optional: Admission controller policies
-│   └── ...
-└── static/               # Optional: Static validation files
-    └── ...
+├── policies/           # Recommended: Kyverno bypass prevention
+│   └── protect.yaml
+└── image/              # Optional: custom Docker images
+    └── Dockerfile
 ```
 
-## 📝 challenge.yaml Template
+## challenge.yaml Template
 
 ```yaml
 title: Your Challenge Title
 description: |
-  Detailed description of what the challenge is about.
-  Explain the scenario, what went wrong, or what needs to be implemented.
-  Use multiple lines to provide context and background information.
+  Describe the SYMPTOMS, not the cause.
+  What is the user experiencing? What's broken?
+  Keep it mysterious - don't reveal the solution.
 
-theme: category-name  # e.g., rbac-security, networking, storage, observability
-difficulty: beginner  # beginner | intermediate | advanced
-estimated_time: 15    # Time in minutes (5-120 recommended)
+theme: category-name  # rbac-security, networking, volumes-secrets, resources-scaling, monitoring-debugging
+difficulty: medium    # easy | medium | hard
+estimated_time: 15    # Minutes (5-60 recommended)
 
 initial_situation: |
-  Describe the current state or what has happened.
-  What is the starting point for the user?
-  What tools/resources are already deployed?
+  Describe what the user will find.
+  What's deployed? What state is it in?
+  Focus on observations, not explanations.
 
 objective: |
-  Clearly state what the user needs to accomplish.
-  What should be the end result?
-  How will they know they've completed the challenge successfully?
+  What should the user achieve?
+  State the goal, not the method.
+  "Make the app work" not "Fix the ConfigMap"
+
+validations:
+  - key: unique-identifier
+    title: "Outcome-Based Title"
+    description: "What this validation checks (not how to fix it)"
+    order: 1
+    type: status  # status | log | event | metrics | rbac | connectivity
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: your-app
+      conditions:
+        - type: Ready
+          status: "True"
+
+  - key: another-validation
+    title: "Another Check"
+    description: "Second validation"
+    order: 2
+    type: log
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: your-app
+      expectedStrings:
+        - "Application started successfully"
+      sinceSeconds: 120
 ```
 
-## 🎯 Challenge Design Guidelines
+## Validation Type Examples
 
-### Good Practices
+### Status (check resource conditions)
+```yaml
+type: status
+spec:
+  target:
+    kind: Pod  # or Deployment, StatefulSet, etc.
+    labelSelector:
+      app: my-app
+  conditions:
+    - type: Ready
+      status: "True"
+```
 
-1. **Clear Learning Objective**: Each challenge should teach one specific concept
-2. **Realistic Scenarios**: Base challenges on real-world problems
-3. **Progressive Difficulty**: Build upon previous knowledge
-4. **Self-Contained**: Include all necessary manifests and resources
-5. **Testable**: Provide clear success criteria
+### Log (find strings in logs)
+```yaml
+type: log
+spec:
+  target:
+    kind: Pod
+    labelSelector:
+      app: my-app
+  expectedStrings:
+    - "Connected to database"
+    - "Server listening"
+  sinceSeconds: 120
+```
 
-### Metadata Guidelines
+### Event (detect bad events)
+```yaml
+type: event
+spec:
+  target:
+    kind: Pod
+    labelSelector:
+      app: my-app
+  forbiddenReasons:
+    - "OOMKilled"
+    - "Evicted"
+    - "BackOff"
+  sinceSeconds: 300
+```
 
-- **Title**: Descriptive but concise (2-4 words)
-- **Description**: 2-3 sentences explaining the scenario
-- **Theme**: Use existing themes or propose new ones
-- **Difficulty**: 
-  - `beginner`: Basic Kubernetes concepts
-  - `intermediate`: Requires some experience 
-  - `advanced`: Complex scenarios or deep knowledge
-- **Estimated Time**: Realistic time for an average learner
+### Metrics (check pod metrics)
+```yaml
+type: metrics
+spec:
+  target:
+    kind: Pod
+    labelSelector:
+      app: my-app
+  metricChecks:
+    - metric: restartCount
+      operator: LessThan  # LessThan, GreaterThan, Equals
+      value: 3
+```
 
-### Content Guidelines
+### RBAC (test permissions)
+```yaml
+type: rbac
+spec:
+  serviceAccountName: my-sa
+  requiredPermissions:
+    - resource: pods
+      verb: list
+    - resource: secrets
+      verb: get
+```
 
-- **Initial Situation**: Set the scene, explain what exists
-- **Objective**: Clear, measurable goals
-- **Manifests**: Well-commented, production-like configurations
-- **Documentation**: Include inline comments in YAML files
+### Connectivity (HTTP checks)
+```yaml
+type: connectivity
+spec:
+  sourcePod:
+    labelSelector:
+      app: client
+  targets:
+    - url: "http://backend-service:8080/health"
+      expectedStatusCode: 200
+      timeoutSeconds: 5
+```
 
-## ✅ Validation Checklist
+## Design Checklist
 
-Before submitting your challenge:
+Before submitting:
 
-- [ ] `challenge.yaml` contains all required fields
-- [ ] Title is descriptive and unique
-- [ ] Description explains the scenario clearly
-- [ ] Theme is appropriate and consistent
-- [ ] Difficulty matches the complexity
-- [ ] Estimated time is realistic (5-120 minutes)
-- [ ] Initial situation provides context
-- [ ] Objective is clear and measurable
-- [ ] Manifests are included in `manifests/` directory
-- [ ] YAML files are properly formatted
-- [ ] Challenge can be completed as described
+- [ ] Description describes symptoms, NOT the cause
+- [ ] Objective states the goal, NOT the solution
+- [ ] Validation titles don't reveal what to fix
+- [ ] Manifests deploy in broken state
+- [ ] Kyverno policies prevent bypasses (image changes, resource deletion)
+- [ ] Challenge works in Kind cluster
+- [ ] Intended solution passes all validations
 
-## 🚀 Submission Process
+## Anti-Patterns to Avoid
 
-1. Create your challenge folder
-2. Add all necessary files
-3. Test locally: `node .github/scripts/validate-challenges.js "your-challenge"`
-4. Submit a pull request
-5. Address any validation feedback
-6. Wait for review and merge
+**Don't reveal the solution:**
+- Bad: "Fix the memory limit configuration"
+- Good: "Make the pod run stably"
 
-## 💡 Theme Examples
+**Don't be too specific in validations:**
+- Bad: `title: "Memory Limit Set to 256Mi"`
+- Good: `title: "Stable Operation"`
 
-Common themes include:
-- `rbac-security` - Role-based access control and security
-- `networking` - Services, ingress, network policies
-- `storage` - Persistent volumes, storage classes
-- `observability` - Monitoring, logging, health checks
-- `troubleshooting` - Debugging and problem resolution
-- `deployment` - Application deployment and management
-- `scaling` - Horizontal/vertical pod autoscaling
-- `configuration` - ConfigMaps, secrets, environment variables
+**Don't explain why things are broken:**
+- Bad: "The ConfigMap has a typo in the JSON"
+- Good: "The application fails to start"
 
-## 📚 Resources
+## Resources
 
-- [Kubernetes Documentation](https://kubernetes.io/docs/)
-- [Kubeasy Platform](https://kubeasy.io)
-- [Challenge Validation Schema](.github/scripts/validation.js)
+- [Challenge Guidelines](../CHALLENGE_GUIDELINES.md)
+- [Existing Challenges](../) for reference

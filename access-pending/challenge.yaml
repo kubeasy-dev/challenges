@@ -1,15 +1,45 @@
 title: Access Pending
 description: |
-  The app was deployed, the image looks fine, but nothing starts. 
+  The app was deployed, the image looks fine, but nothing starts.
   Dig into what happens before the first log line ever appears.
 theme: rbac-security
 difficulty: hard
 estimated_time: 15
-initial_situation: | 
-  A recent deployment was pushed using the usual CI process, with a custom image and a startup probe.  
-  The application doesn't seem to be running as expected.  
+initial_situation: |
+  A recent deployment was pushed using the usual CI process, with a custom image and a startup probe.
+  The application doesn't seem to be running as expected.
   You're now responsible for diagnosing and unlocking the situation — but without modifying the image or bypassing any critical settings.
 objective: |
   Ensure the application starts correctly and that the Pod becomes Ready.
   Something is blocking the startup sequence — your job is to identify the root cause
   and adjust the current configuration so the rollout can complete successfully.
+
+validations:
+  - key: pod-ready-check
+    title: "Pod Ready"
+    description: "The startup-app pod must be running and in Ready state"
+    order: 1
+    type: status
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: startup-app
+      conditions:
+        - type: Ready
+          status: "True"
+
+  - key: pod-logs-check
+    title: "Application Logs Check"
+    description: "The startup-app must output 'Access OK' indicating successful API access"
+    order: 2
+    type: log
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: startup-app
+      container: startup-app
+      expectedStrings:
+        - "Access OK"
+      sinceSeconds: 120

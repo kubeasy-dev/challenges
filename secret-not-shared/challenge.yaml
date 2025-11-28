@@ -14,3 +14,32 @@ initial_situation: |
 objective: |
   Fix the deployment configuration so the pod can access the database credentials from the Secret.
   The application expects credentials as environment variables: DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD.
+
+validations:
+  - key: pod-ready-check
+    title: "Pod Ready"
+    description: "The api-service pod must be running and in Ready state"
+    order: 1
+    type: status
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: api-service
+      conditions:
+        - type: Ready
+          status: "True"
+
+  - key: database-connection-check
+    title: "Database Connection"
+    description: "The api-service must successfully connect to the database"
+    order: 2
+    type: log
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: api-service
+      expectedStrings:
+        - "Connected to database successfully"
+      sinceSeconds: 120

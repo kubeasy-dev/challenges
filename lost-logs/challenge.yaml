@@ -14,3 +14,20 @@ initial_situation: |
 objective: |
   Fix the logging configuration so all container logs are visible via kubectl logs.
   Ensure logs are written to stdout/stderr following 12-factor app principles.
+
+validations:
+  - key: check-logger-stdout
+    title: "Sidecar Logs"
+    description: "The logger sidecar must capture and output both 'Application log entry' and 'Logger sidecar' messages"
+    order: 1
+    type: log
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: web-app
+      container: logger
+      expectedStrings:
+        - "Application log entry"
+        - "Logger sidecar"
+      sinceSeconds: 60

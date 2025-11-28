@@ -14,3 +14,49 @@ initial_situation: |
 objective: |
   Fix the resource configuration so the pod can run without being evicted.
   Understand the difference between requests and limits, and how Kubernetes manages resources.
+
+validations:
+  - key: pod-running-check
+    title: "Pod Ready"
+    description: "The data-processor pod must be running and in Ready state"
+    order: 1
+    type: status
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: data-processor
+      conditions:
+        - type: Ready
+          status: "True"
+
+  - key: no-oom-eviction
+    title: "No OOM/Eviction Events"
+    description: "The pod should run without being evicted or killed by the system"
+    order: 2
+    type: event
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: data-processor
+      forbiddenReasons:
+        - "Evicted"
+        - "OOMKilled"
+        - "FailedScheduling"
+      sinceSeconds: 300
+
+  - key: low-restart-count
+    title: "Low Restart Count"
+    description: "The data-processor pod must have fewer than 3 restarts (stable operation)"
+    order: 3
+    type: metrics
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: data-processor
+      metricChecks:
+        - metric: restartCount
+          operator: LessThan
+          value: 3

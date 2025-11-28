@@ -12,3 +12,33 @@ initial_situation: |
 objective: |
   Investigate why the nightly job keeps failing and restore normal operation.
   The processing workflow should complete successfully every night.
+
+validations:
+  - key: job-completion-check
+    title: "Job Completed"
+    description: "The data-processor Job must reach 'Complete' status"
+    order: 1
+    type: status
+    spec:
+      target:
+        kind: Job
+        labelSelector:
+          job-name: data-processor
+      conditions:
+        - type: Complete
+          status: "True"
+
+  - key: job-logs-check
+    title: "Job Logs Check"
+    description: "The data-processor job must log 'Data processing completed successfully!'"
+    order: 2
+    type: log
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          job-name: data-processor
+      container: processor
+      expectedStrings:
+        - "Data processing completed successfully!"
+      sinceSeconds: 300

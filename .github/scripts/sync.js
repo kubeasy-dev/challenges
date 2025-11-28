@@ -7,6 +7,9 @@ const { validateChallenge } = require("./validation");
 const API_URL = process.env.API_URL
 const API_TOKEN = process.env.API_TOKEN;
 
+// Valid validation types for objectives
+const VALID_TYPES = ["status", "log", "event", "metrics", "rbac", "connectivity"];
+
 if (!API_TOKEN) {
   console.error("Missing API_TOKEN env variable");
   console.error("Set your admin API token: export API_TOKEN=your_token_here");
@@ -40,6 +43,55 @@ function findAllChallenges() {
 }
 
 /**
+ * Converts a CRD name to a human-readable title
+ * e.g., "app-ready-check" -> "App Ready Check"
+ */
+function formatDisplayName(name) {
+  return name
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
+/**
+ * Extracts objectives from validations array in challenge data
+ */
+function extractObjectives(folder, validations) {
+  if (!validations || !Array.isArray(validations)) {
+    return [];
+  }
+
+  const objectives = [];
+
+  for (const validation of validations) {
+    const key = validation.key;
+    if (!key) {
+      console.warn(`   ⚠️  ${folder}/challenge.yaml: validation missing 'key' field`);
+      continue;
+    }
+
+    const type = validation.type;
+    if (!type || !VALID_TYPES.includes(type)) {
+      console.warn(`   ⚠️  ${folder}/challenge.yaml: validation '${key}' has invalid type '${type}'`);
+      continue;
+    }
+
+    objectives.push({
+      objectiveKey: key,
+      title: validation.title || formatDisplayName(key),
+      description: validation.description || null,
+      category: type,
+      displayOrder: validation.order || 0,
+    });
+  }
+
+  // Sort by display order
+  objectives.sort((a, b) => a.displayOrder - b.displayOrder);
+
+  return objectives;
+}
+
+/**
  * Loads and validates a single challenge from its folder
  */
 async function loadChallenge(folder) {
@@ -65,6 +117,9 @@ async function loadChallenge(folder) {
     throw new Error(`Validation errors:\n${validationErrors.join('\n')}`);
   }
 
+  // Extract objectives from validations in challenge.yaml
+  const objectives = extractObjectives(folder, challenge.validations);
+
   return {
     slug: folder,
     title: challenge.title,
@@ -75,6 +130,7 @@ async function loadChallenge(folder) {
     initialSituation: challenge.initial_situation,
     objective: challenge.objective,
     ofTheWeek: challenge.of_the_week || false,
+    objectives,
   };
 }
 
@@ -137,7 +193,8 @@ async function main() {
     try {
       const challenge = await loadChallenge(folder);
       challenges.push(challenge);
-      console.log(`   ✅ ${folder}: ${challenge.title}`);
+      const objectivesCount = challenge.objectives?.length || 0;
+      console.log(`   ✅ ${folder}: ${challenge.title} (${objectivesCount} objectives)`);
     } catch (err) {
       errors.push({ folder, error: err.message });
       console.error(`   ❌ ${folder}: ${err.message}`);
