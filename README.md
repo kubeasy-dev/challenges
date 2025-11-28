@@ -95,6 +95,8 @@ validations:
 | `volumes-secrets` | Storage, ConfigMaps, Secrets |
 | `resources-scaling` | Limits, requests, HPA |
 | `monitoring-debugging` | Probes, logging, events |
+| `pods-containers` | Pod and container lifecycle, configuration, health |
+| `jobs-cronjobs` | Batch jobs, scheduled jobs, job failures |
 
 ## Synchronization
 
