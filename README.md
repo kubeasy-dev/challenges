@@ -109,7 +109,7 @@ Run locally:
 ```bash
 cd .github/scripts
 npm install
-ADMIN_API_URL=... ADMIN_API_TOKEN=... node sync.js
+API_URL=... API_TOKEN=... node sync.js
 ```
 
 ## Contributing
