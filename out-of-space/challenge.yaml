@@ -13,3 +13,35 @@ initial_situation: |
 objective: |
   Figure out why scaling breaks the deployment and get things working again.
   Not every problem is solved by throwing more replicas at it.
+
+validations:
+  - key: all-postgres-pods-ready
+    title: "All Pods Ready"
+    description: "All postgres pods must be in Ready state"
+    order: 1
+    type: status
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: postgres
+      conditions:
+        - type: Ready
+          status: "True"
+
+  - key: statefulset-replicas-check
+    title: "StatefulSet Replicas"
+    description: "The postgres StatefulSet must have exactly 3 ready and available replicas"
+    order: 2
+    type: metrics
+    spec:
+      target:
+        kind: StatefulSet
+        name: postgres
+      metricChecks:
+        - metric: readyReplicas
+          operator: Equals
+          value: 3
+        - metric: availableReplicas
+          operator: Equals
+          value: 3

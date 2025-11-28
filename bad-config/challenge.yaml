@@ -13,3 +13,32 @@ initial_situation: |
 objective: |
   Make sure configuration changes actually reach the running application.
   Future config updates shouldn't silently fail like this.
+
+validations:
+  - key: pod-ready-check
+    title: "Pod Ready"
+    description: "The config-app pod must be running and in Ready state"
+    order: 1
+    type: status
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: config-app
+      conditions:
+        - type: Ready
+          status: "True"
+
+  - key: pod-logs-check
+    title: "Configuration Loaded"
+    description: "The application must log 'Configuration loaded successfully!' after reading the ConfigMap"
+    order: 2
+    type: log
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: config-app
+      expectedStrings:
+        - "Configuration loaded successfully!"
+      sinceSeconds: 120

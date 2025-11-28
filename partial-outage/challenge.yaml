@@ -1,6 +1,6 @@
 title: Partial Outage
-description: The frontend app is up — but some users report failures. It’s not the code.
-  Investigate the cluster’s configuration before the incident spreads.
+description: The frontend app is up — but some users report failures. It's not the code.
+  Investigate the cluster's configuration before the incident spreads.
 theme: networking
 difficulty: easy
 estimated_time: 10
@@ -8,3 +8,32 @@ initial_situation: |
   A frontend Deployment with 2 replicas and a backend Deployment with 1 replica are deployed in the same namespace.
   A NetworkPolicy is defined, but users still report issues — possibly related to intra-cluster communication.
 objective: Ensure the frontend can successfully communicate with the backend over HTTP, while keeping traffic restricted.
+
+validations:
+  - key: frontend-ready-check
+    title: "Frontend Ready"
+    description: "The frontend pod must be running and in Ready state"
+    order: 1
+    type: status
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: frontend
+      conditions:
+        - type: Ready
+          status: "True"
+
+  - key: frontend-logs-check
+    title: "Backend Connection"
+    description: "The frontend must log 'Connected to backend' indicating successful connectivity"
+    order: 2
+    type: log
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: frontend
+      expectedStrings:
+        - "Connected to backend"
+      sinceSeconds: 120
