@@ -23,7 +23,7 @@ validations:
       target:
         kind: Job
         labelSelector:
-          job-name: data-processor
+          job-name: data-processor*
       conditions:
         - type: Complete
           status: "True"
