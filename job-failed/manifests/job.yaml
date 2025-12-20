@@ -2,24 +2,29 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: data-processor-manual
+  labels:
+    app: data-processor
 spec:
   activeDeadlineSeconds: 30
   template:
+    metadata:
+      labels:
+        app: data-processor
     spec:
       restartPolicy: Never
       containers:
         - name: processor
           image: busybox:latest
           command: ["/bin/sh"]
-          args: 
+          args:
             - -c
             - |
-              echo "Starting manual data processing test..."
+              echo "Starting data processing..."
               for i in $(seq 1 12); do
                 echo "Processing batch $i/12"
                 sleep 5
               done
-              echo "Manual processing completed!"
+              echo "Data processing completed successfully!"
           resources:
             requests:
               cpu: "100m"

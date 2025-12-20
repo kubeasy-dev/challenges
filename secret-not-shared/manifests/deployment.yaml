@@ -43,7 +43,7 @@ spec:
               echo "✓ DATABASE_USER: $DATABASE_USER"
               echo "✓ DATABASE_PASSWORD: [REDACTED]"
               echo ""
-              echo "Database configuration complete!"
+              echo "Connected to database successfully"
               echo "Starting API server on port 8080..."
               echo "=========================================="
 

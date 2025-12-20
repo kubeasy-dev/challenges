@@ -1,0 +1,31 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: protect-pss-labels-privilege-denied
+spec:
+  validationFailureAction: Enforce
+  background: false
+  rules:
+    - name: protect-pss-enforce-label
+      match:
+        resources:
+          kinds: ["Namespace"]
+          names: ["privilege-denied"]
+      validate:
+        message: "Pod Security Standards labels cannot be modified or removed"
+        pattern:
+          metadata:
+            labels:
+              pod-security.kubernetes.io/enforce: restricted
+
+    - name: protect-pss-warn-label
+      match:
+        resources:
+          kinds: ["Namespace"]
+          names: ["privilege-denied"]
+      validate:
+        message: "Pod Security Standards labels cannot be modified or removed"
+        pattern:
+          metadata:
+            labels:
+              pod-security.kubernetes.io/warn: restricted

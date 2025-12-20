@@ -17,14 +17,14 @@ objective: |
 validations:
   - key: pod-ready-check
     title: "Pod Ready"
-    description: "The config-app pod must be running and in Ready state"
+    description: "The web-app pod must be running and in Ready state"
     order: 1
     type: status
     spec:
       target:
         kind: Pod
         labelSelector:
-          app: config-app
+          app: web-app
       conditions:
         - type: Ready
           status: "True"
@@ -38,7 +38,7 @@ validations:
       target:
         kind: Pod
         labelSelector:
-          app: config-app
+          app: web-app
       expectedStrings:
         - "Configuration loaded successfully!"
       sinceSeconds: 120

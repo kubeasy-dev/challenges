@@ -24,7 +24,7 @@ validations:
       target:
         kind: Pod
         labelSelector:
-          app: api
+          app: api-service
       conditions:
         - type: Ready
           status: "True"
@@ -37,7 +37,7 @@ validations:
     spec:
       sourcePod:
         labelSelector:
-          app: api
+          app: api-service
       targets:
         - url: "http://api-service"
           expectedStatusCode: 200
@@ -51,10 +51,10 @@ validations:
     spec:
       sourcePod:
         labelSelector:
-          app: api
+          app: api-service
       targets:
         - url: "http://ingress-nginx-controller.ingress-nginx.svc.cluster.local"
           headers:
-            Host: "api.local"
+            Host: "api.example.com"
           expectedStatusCode: 200
           timeoutSeconds: 5

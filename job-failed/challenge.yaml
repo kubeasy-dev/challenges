@@ -23,7 +23,7 @@ validations:
       target:
         kind: Job
         labelSelector:
-          job-name: data-processor
+          app: data-processor
       conditions:
         - type: Complete
           status: "True"
@@ -37,7 +37,7 @@ validations:
       target:
         kind: Pod
         labelSelector:
-          job-name: data-processor
+          app: data-processor
       container: processor
       expectedStrings:
         - "Data processing completed successfully!"
