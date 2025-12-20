@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: postgres-db
+  name: postgres
 spec:
   serviceName: postgres-service
   replicas: 3  # Problem: 3 replicas with ReadWriteOnce volumes
   selector:
     matchLabels:
-      app: postgres-db
+      app: postgres
   template:
     metadata:
       labels:
-        app: postgres-db
+        app: postgres
     spec:
       containers:
         - name: postgres

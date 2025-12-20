@@ -5,9 +5,15 @@ metadata:
 spec:
   schedule: "0 2 * * *"
   jobTemplate:
+    metadata:
+      labels:
+        app: data-processor
     spec:
       activeDeadlineSeconds: 30
       template:
+        metadata:
+          labels:
+            app: data-processor
         spec:
           restartPolicy: OnFailure
           containers:
