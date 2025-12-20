@@ -5,6 +5,7 @@ description: |
 theme: pods-containers
 difficulty: easy
 estimated_time: 15
+starter_friendly: true
 initial_situation: |
   A web application is deployed with its configuration in a ConfigMap.
   The team updated the ConfigMap to enable a new feature flag.

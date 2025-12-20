@@ -5,6 +5,7 @@ description: |
 theme: resources-scaling
 difficulty: easy
 estimated_time: 15
+starter_friendly: true
 initial_situation: |
   A data processing application is deployed as a single pod.
   The pod starts successfully but after a few seconds gets OOMKilled (Out of Memory).

@@ -5,6 +5,7 @@ description: |
 theme: monitoring-debugging
 difficulty: easy
 estimated_time: 15
+starter_friendly: true
 initial_situation: |
   A multi-container pod is deployed with a main application and a sidecar logger.
   The main application runs fine and you can see its logs with kubectl logs.

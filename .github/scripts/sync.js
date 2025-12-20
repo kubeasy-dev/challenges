@@ -130,6 +130,7 @@ async function loadChallenge(folder) {
     initialSituation: challenge.initial_situation,
     objective: challenge.objective,
     ofTheWeek: challenge.of_the_week || false,
+    starterFriendly: challenge.starter_friendly || false,
     objectives,
   };
 }

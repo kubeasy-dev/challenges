@@ -4,6 +4,7 @@ description: The frontend app is up — but some users report failures. It's not
 theme: networking
 difficulty: easy
 estimated_time: 10
+starter_friendly: true
 initial_situation: |
   A frontend Deployment with 2 replicas and a backend Deployment with 1 replica are deployed in the same namespace.
   A NetworkPolicy is defined, but users still report issues — possibly related to intra-cluster communication.
