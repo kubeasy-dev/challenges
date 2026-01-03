@@ -4,6 +4,8 @@ metadata:
   name: deny-all
   labels:
     validate: "false"
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   podSelector: {}
   policyTypes:

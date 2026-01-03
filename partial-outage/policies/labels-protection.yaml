@@ -2,6 +2,8 @@ apiVersion: kyverno.io/v1
 kind: Policy
 metadata:
   name: protect-app-labels
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   rules:
     - name: block-label-change

@@ -2,6 +2,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: startup-check-role
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 rules:
   - apiGroups: [""]
     resources: ["pods"]

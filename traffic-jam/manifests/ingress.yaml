@@ -4,6 +4,7 @@ metadata:
   name: api-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   rules:
     - host: api.example.com
