@@ -4,6 +4,8 @@ metadata:
   name: data-processor-manual
   labels:
     app: data-processor
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   activeDeadlineSeconds: 30
   template:

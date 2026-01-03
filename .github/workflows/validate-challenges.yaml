@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - '**/challenge.yaml'
+      - '**/manifests/*.yaml'
+      - '**/policies/*.yaml'
     types: [opened, synchronize, reopened]
 
 jobs:
@@ -21,7 +23,10 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v46
         with:
-          files: '**/challenge.yaml'
+          files: |
+            **/challenge.yaml
+            **/manifests/*.yaml
+            **/policies/*.yaml
           dir_names: true
           dir_names_max_depth: 1
 

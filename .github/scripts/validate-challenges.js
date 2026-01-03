@@ -34,6 +34,68 @@ if (challenges.length === 0) {
   process.exit(0);
 }
 
+/**
+ * Validates ArgoCD sync-wave annotations on manifest and policy files
+ * Rules:
+ *   - manifests/namespace.yaml → sync-wave: "0"
+ *   - manifests/*.yaml (others) → sync-wave: "1"
+ *   - policies/*.yaml → sync-wave: "2"
+ */
+function validateSyncWaveAnnotations(rootPath, challengeFolder) {
+  const errors = [];
+
+  const getSyncWave = (filePath) => {
+    try {
+      const content = fs.readFileSync(filePath, 'utf8');
+      const docs = yaml.loadAll(content);
+
+      for (const doc of docs) {
+        if (doc && doc.metadata) {
+          const annotations = doc.metadata.annotations || {};
+          return annotations['argocd.argoproj.io/sync-wave'];
+        }
+      }
+      return undefined;
+    } catch {
+      return undefined;
+    }
+  };
+
+  // Check manifests folder
+  const manifestsPath = path.join(rootPath, challengeFolder, 'manifests');
+  if (fs.existsSync(manifestsPath)) {
+    const manifestFiles = fs.readdirSync(manifestsPath).filter(f => f.endsWith('.yaml') || f.endsWith('.yml'));
+
+    for (const file of manifestFiles) {
+      const filePath = path.join(manifestsPath, file);
+      const syncWave = getSyncWave(filePath);
+      const isNamespace = file === 'namespace.yaml' || file === 'namespace.yml';
+      const expectedWave = isNamespace ? '0' : '1';
+
+      if (syncWave !== expectedWave) {
+        errors.push(`manifests/${file}: expected sync-wave "${expectedWave}", got "${syncWave || 'none'}"`);
+      }
+    }
+  }
+
+  // Check policies folder
+  const policiesPath = path.join(rootPath, challengeFolder, 'policies');
+  if (fs.existsSync(policiesPath)) {
+    const policyFiles = fs.readdirSync(policiesPath).filter(f => f.endsWith('.yaml') || f.endsWith('.yml'));
+
+    for (const file of policyFiles) {
+      const filePath = path.join(policiesPath, file);
+      const syncWave = getSyncWave(filePath);
+
+      if (syncWave !== '2') {
+        errors.push(`policies/${file}: expected sync-wave "2", got "${syncWave || 'none'}"`);
+      }
+    }
+  }
+
+  return errors;
+}
+
 // Function to validate a single challenge
 async function validateSingleChallenge(challengeFolder) {
   console.log(`\n🔍 Validating challenge: ${challengeFolder}`);
@@ -97,6 +159,16 @@ async function validateSingleChallenge(challengeFolder) {
       if (manifestFiles.length === 0) {
         warnings.push("No YAML files found in manifests/ directory.");
       }
+    }
+
+    // Validate ArgoCD sync-wave annotations
+    const syncWaveErrors = validateSyncWaveAnnotations(rootPath, challengeFolder);
+    if (syncWaveErrors.length > 0) {
+      console.error(`❌ Sync-wave annotation errors in ${challengeFolder}:`);
+      syncWaveErrors.forEach(error => {
+        console.error(`   • ${error}`);
+      });
+      return false;
     }
     
     // Display warnings
