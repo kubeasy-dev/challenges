@@ -54,41 +54,28 @@ function formatDisplayName(name) {
 }
 
 /**
- * Extracts objectives from objectives array in challenge data
+ * Validates objectives from challenge data
+ * Returns the raw objectives array (API expects original format)
  */
-function extractObjectives(folder, objectivesData) {
+function validateObjectives(folder, objectivesData) {
   if (!objectivesData || !Array.isArray(objectivesData)) {
     return [];
   }
-
-  const objectives = [];
 
   for (const objective of objectivesData) {
     const key = objective.key;
     if (!key) {
       console.warn(`   ⚠️  ${folder}/challenge.yaml: objective missing 'key' field`);
-      continue;
     }
 
     const type = objective.type;
     if (!type || !VALID_TYPES.includes(type)) {
       console.warn(`   ⚠️  ${folder}/challenge.yaml: objective '${key}' has invalid type '${type}'`);
-      continue;
     }
-
-    objectives.push({
-      objectiveKey: key,
-      title: objective.title || formatDisplayName(key),
-      description: objective.description || null,
-      category: type,
-      displayOrder: objective.order || 0,
-    });
   }
 
-  // Sort by display order
-  objectives.sort((a, b) => a.displayOrder - b.displayOrder);
-
-  return objectives;
+  // Return raw objectives - API expects original format from challenge.yaml
+  return objectivesData;
 }
 
 /**
@@ -117,8 +104,8 @@ async function loadChallenge(folder) {
     throw new Error(`Validation errors:\n${validationErrors.join('\n')}`);
   }
 
-  // Extract objectives from objectives array in challenge.yaml
-  const objectives = extractObjectives(folder, challenge.objectives);
+  // Validate objectives (returns raw format for API)
+  const objectives = validateObjectives(folder, challenge.objectives);
 
   return {
     slug: folder,
