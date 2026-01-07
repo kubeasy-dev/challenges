@@ -4,8 +4,9 @@ description: |
   It used to work fine, but now it times out and gets killed by Kubernetes.
 theme: jobs-cronjobs
 difficulty: medium
-estimated_time: 15
-initial_situation: |
+type: fix
+estimatedTime: 15
+initialSituation: |
   A CronJob that processes data every night has been consistently failing.
   The job starts running but gets terminated before completion.
   The processing logic hasn't changed, but something in the cluster configuration is causing issues.
@@ -13,7 +14,7 @@ objective: |
   Investigate why the nightly job keeps failing and restore normal operation.
   The processing workflow should complete successfully every night.
 
-validations:
+objectives:
   - key: job-completion-check
     title: "Job Completed"
     description: "The data-processor Job must reach 'Complete' status"

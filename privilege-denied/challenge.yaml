@@ -4,8 +4,9 @@ description: |
   Security policies have been enforced, and the deployment needs updating.
 theme: rbac-security
 difficulty: medium
-estimated_time: 20
-initial_situation: |
+type: fix
+estimatedTime: 20
+initialSituation: |
   A legacy application was deployed and worked fine initially.
   After implementing Pod Security Standards at the cluster level, the pod fails to start.
   The error message shows: "Error: container has runAsNonRoot and image will run as root".
@@ -15,7 +16,7 @@ objective: |
   Update the deployment's SecurityContext to comply with Pod Security Standards.
   Make the application run as a non-root user and use a read-only root filesystem.
 
-validations:
+objectives:
   - key: pod-ready-check
     title: "Pod Ready"
     description: "The legacy-app pod must be running and in Ready state"

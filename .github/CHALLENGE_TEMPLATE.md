@@ -6,7 +6,7 @@ Use this template to create new challenges for Kubeasy.
 
 ```
 your-challenge-name/
-├── challenge.yaml      # Required: metadata + validations
+├── challenge.yaml      # Required: metadata + objectives
 ├── manifests/          # Required: broken K8s manifests
 │   ├── deployment.yaml
 │   ├── service.yaml
@@ -28,9 +28,10 @@ description: |
 
 theme: category-name  # rbac-security, networking, volumes-secrets, resources-scaling, monitoring-debugging
 difficulty: medium    # easy | medium | hard
-estimated_time: 15    # Minutes (5-60 recommended)
+type: fix             # fix | build | migrate
+estimatedTime: 15     # Minutes (5-60 recommended)
 
-initial_situation: |
+initialSituation: |
   Describe what the user will find.
   What's deployed? What state is it in?
   Focus on observations, not explanations.
@@ -40,12 +41,12 @@ objective: |
   State the goal, not the method.
   "Make the app work" not "Fix the ConfigMap"
 
-validations:
+objectives:
   - key: unique-identifier
     title: "Outcome-Based Title"
     description: "What this validation checks (not how to fix it)"
     order: 1
-    type: status  # status | log | event | metrics | rbac | connectivity
+    type: status  # status | log | event | metrics | connectivity
     spec:
       target:
         kind: Pod
@@ -70,7 +71,7 @@ validations:
       sinceSeconds: 120
 ```
 
-## Validation Type Examples
+## Objective Type Examples
 
 ### Status (check resource conditions)
 ```yaml
@@ -122,22 +123,10 @@ spec:
     kind: Pod
     labelSelector:
       app: my-app
-  metricChecks:
-    - metric: restartCount
+  checks:
+    - field: restartCount
       operator: LessThan  # LessThan, GreaterThan, Equals
       value: 3
-```
-
-### RBAC (test permissions)
-```yaml
-type: rbac
-spec:
-  serviceAccountName: my-sa
-  requiredPermissions:
-    - resource: pods
-      verb: list
-    - resource: secrets
-      verb: get
 ```
 
 ### Connectivity (HTTP checks)
@@ -159,11 +148,11 @@ Before submitting:
 
 - [ ] Description describes symptoms, NOT the cause
 - [ ] Objective states the goal, NOT the solution
-- [ ] Validation titles don't reveal what to fix
+- [ ] Objective titles don't reveal what to fix
 - [ ] Manifests deploy in broken state
 - [ ] Kyverno policies prevent bypasses (image changes, resource deletion)
 - [ ] Challenge works in Kind cluster
-- [ ] Intended solution passes all validations
+- [ ] Intended solution passes all objectives
 
 ## Anti-Patterns to Avoid
 
@@ -171,7 +160,7 @@ Before submitting:
 - Bad: "Fix the memory limit configuration"
 - Good: "Make the pod run stably"
 
-**Don't be too specific in validations:**
+**Don't be too specific in objectives:**
 - Bad: `title: "Memory Limit Set to 256Mi"`
 - Good: `title: "Stable Operation"`
 

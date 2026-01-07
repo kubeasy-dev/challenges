@@ -4,8 +4,9 @@ description: |
   Dig into what happens before the first log line ever appears.
 theme: rbac-security
 difficulty: hard
-estimated_time: 15
-initial_situation: |
+type: fix
+estimatedTime: 15
+initialSituation: |
   A recent deployment was pushed using the usual CI process, with a custom image and a startup probe.
   The application doesn't seem to be running as expected.
   You're now responsible for diagnosing and unlocking the situation — but without modifying the image or bypassing any critical settings.
@@ -14,7 +15,7 @@ objective: |
   Something is blocking the startup sequence — your job is to identify the root cause
   and adjust the current configuration so the rollout can complete successfully.
 
-validations:
+objectives:
   - key: pod-ready-check
     title: "Pod Ready"
     description: "The startup-app pod must be running and in Ready state"

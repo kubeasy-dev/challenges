@@ -4,8 +4,9 @@ description: |
   The Secret exists, but the pod doesn't have access to it.
 theme: volumes-secrets
 difficulty: medium
-estimated_time: 20
-initial_situation: |
+type: fix
+estimatedTime: 20
+initialSituation: |
   A new microservice was deployed that needs to connect to a PostgreSQL database.
   The database credentials are stored in a Kubernetes Secret.
   The Secret exists and contains the correct username and password.
@@ -15,7 +16,7 @@ objective: |
   Fix the deployment configuration so the pod can access the database credentials from the Secret.
   The application expects credentials as environment variables: DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD.
 
-validations:
+objectives:
   - key: pod-ready-check
     title: "Pod Ready"
     description: "The api-service pod must be running and in Ready state"

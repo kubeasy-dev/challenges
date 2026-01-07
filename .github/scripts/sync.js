@@ -7,8 +7,8 @@ const { validateChallenge } = require("./validation");
 const API_URL = process.env.API_URL
 const API_TOKEN = process.env.API_TOKEN;
 
-// Valid validation types for objectives
-const VALID_TYPES = ["status", "log", "event", "metrics", "rbac", "connectivity"];
+// Valid validation types for objectives (matches remote schema)
+const VALID_TYPES = ["status", "log", "event", "metrics", "connectivity"];
 
 if (!API_TOKEN) {
   console.error("Missing API_TOKEN env variable");
@@ -54,34 +54,34 @@ function formatDisplayName(name) {
 }
 
 /**
- * Extracts objectives from validations array in challenge data
+ * Extracts objectives from objectives array in challenge data
  */
-function extractObjectives(folder, validations) {
-  if (!validations || !Array.isArray(validations)) {
+function extractObjectives(folder, objectivesData) {
+  if (!objectivesData || !Array.isArray(objectivesData)) {
     return [];
   }
 
   const objectives = [];
 
-  for (const validation of validations) {
-    const key = validation.key;
+  for (const objective of objectivesData) {
+    const key = objective.key;
     if (!key) {
-      console.warn(`   ⚠️  ${folder}/challenge.yaml: validation missing 'key' field`);
+      console.warn(`   ⚠️  ${folder}/challenge.yaml: objective missing 'key' field`);
       continue;
     }
 
-    const type = validation.type;
+    const type = objective.type;
     if (!type || !VALID_TYPES.includes(type)) {
-      console.warn(`   ⚠️  ${folder}/challenge.yaml: validation '${key}' has invalid type '${type}'`);
+      console.warn(`   ⚠️  ${folder}/challenge.yaml: objective '${key}' has invalid type '${type}'`);
       continue;
     }
 
     objectives.push({
       objectiveKey: key,
-      title: validation.title || formatDisplayName(key),
-      description: validation.description || null,
+      title: objective.title || formatDisplayName(key),
+      description: objective.description || null,
       category: type,
-      displayOrder: validation.order || 0,
+      displayOrder: objective.order || 0,
     });
   }
 
@@ -117,8 +117,8 @@ async function loadChallenge(folder) {
     throw new Error(`Validation errors:\n${validationErrors.join('\n')}`);
   }
 
-  // Extract objectives from validations in challenge.yaml
-  const objectives = extractObjectives(folder, challenge.validations);
+  // Extract objectives from objectives array in challenge.yaml
+  const objectives = extractObjectives(folder, challenge.objectives);
 
   return {
     slug: folder,
@@ -126,11 +126,12 @@ async function loadChallenge(folder) {
     description: challenge.description,
     theme: challenge.theme,
     difficulty: challenge.difficulty,
-    estimatedTime: challenge.estimated_time,
-    initialSituation: challenge.initial_situation,
+    type: challenge.type || "fix",
+    estimatedTime: challenge.estimatedTime,
+    initialSituation: challenge.initialSituation,
     objective: challenge.objective,
-    ofTheWeek: challenge.of_the_week || false,
-    starterFriendly: challenge.starter_friendly || false,
+    ofTheWeek: challenge.ofTheWeek || false,
+    starterFriendly: challenge.starterFriendly || false,
     objectives,
   };
 }
