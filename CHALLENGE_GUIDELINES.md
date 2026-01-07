@@ -58,14 +58,14 @@ Describe what the user will find, not what's wrong:
 
 **Bad**:
 ```yaml
-initial_situation: |
+initialSituation: |
   The deployment has incorrect resource limits set to 10Mi memory,
   which is too low for the application.
 ```
 
 **Good**:
 ```yaml
-initial_situation: |
+initialSituation: |
   A data processing application is deployed as a single pod.
   The pod starts successfully but gets killed after a few seconds.
   It enters a CrashLoopBackOff state and keeps restarting.
@@ -90,30 +90,30 @@ objective: |
 
 ---
 
-## Validation Design
+## Objective Design
 
-Validations verify the solution is correct. **They should confirm the fix worked, not guide users to the fix.**
+Objectives verify the solution is correct. **They should confirm the fix worked, not guide users to the fix.**
 
 ### Golden Rule
 
-> **A validation should check the outcome, not the specific implementation.**
+> **An objective should check the outcome, not the specific implementation.**
 
-### Validation Types
+### Objective Types
 
-Each validation is defined in the `validations` section of `challenge.yaml`:
+Each objective is defined in the `objectives` section of `challenge.yaml`:
 
 ```yaml
-validations:
+objectives:
   - key: unique-identifier
     title: "User-Friendly Title"
-    description: "What this validation checks"
+    description: "What this objective checks"
     order: 1
-    type: status|log|event|metrics|rbac|connectivity
+    type: status|log|event|metrics|connectivity
     spec:
       # Type-specific configuration
 ```
 
-### Available Validation Types
+### Available Objective Types
 
 | Type | Purpose | Example Use Case |
 |------|---------|------------------|
@@ -121,12 +121,11 @@ validations:
 | `log` | Find strings in container logs | "Connected to database", "Server started" |
 | `event` | Detect forbidden K8s events | No OOMKilled, no Evicted events |
 | `metrics` | Check pod/deployment metrics | Restart count < 3, replicas >= 2 |
-| `rbac` | Test ServiceAccount permissions | Can create pods, can list secrets |
 | `connectivity` | HTTP connectivity tests | Service responds with 200 |
 
-### Validation Examples
+### Objective Examples
 
-#### Status Validation
+#### Status Objective
 ```yaml
 - key: pod-ready-check
   title: "Pod Ready"
@@ -143,7 +142,7 @@ validations:
         status: "True"
 ```
 
-#### Log Validation
+#### Log Objective
 ```yaml
 - key: database-connection
   title: "Database Connected"
@@ -160,7 +159,7 @@ validations:
     sinceSeconds: 120
 ```
 
-#### Event Validation
+#### Event Objective
 ```yaml
 - key: no-crashes
   title: "No Crash Events"
@@ -179,7 +178,7 @@ validations:
     sinceSeconds: 300
 ```
 
-#### Metrics Validation
+#### Metrics Objective
 ```yaml
 - key: low-restarts
   title: "Stable Operation"
@@ -191,34 +190,18 @@ validations:
       kind: Pod
       labelSelector:
         app: my-app
-    metricChecks:
-      - metric: restartCount
+    checks:
+      - field: restartCount
         operator: LessThan
         value: 3
 ```
 
-#### RBAC Validation
-```yaml
-- key: sa-permissions
-  title: "ServiceAccount Permissions"
-  description: "The service account must have required permissions"
-  order: 5
-  type: rbac
-  spec:
-    serviceAccountName: my-service-account
-    requiredPermissions:
-      - resource: pods
-        verb: list
-      - resource: secrets
-        verb: get
-```
-
-#### Connectivity Validation
+#### Connectivity Objective
 ```yaml
 - key: service-reachable
   title: "Service Connectivity"
   description: "The service must be reachable from within the cluster"
-  order: 6
+  order: 5
   type: connectivity
   spec:
     sourcePod:
@@ -232,7 +215,7 @@ validations:
 
 ---
 
-## Validation Anti-Patterns
+## Objective Anti-Patterns
 
 ### Don't Reveal the Solution
 
@@ -296,7 +279,7 @@ Use Kyverno policies to prevent users from bypassing the challenge entirely (e.g
 
 - Container images (prevent replacing the app)
 - Critical volume mounts (prevent removing problematic configs)
-- Essential labels (ensure validations can find resources)
+- Essential labels (ensure objectives can find resources)
 
 ### Example Policy
 
@@ -342,7 +325,7 @@ Each challenge folder should contain:
 
 ```
 challenge-name/
-├── challenge.yaml      # Metadata, description, AND validations
+├── challenge.yaml      # Metadata, description, AND objectives
 ├── manifests/          # Initial Kubernetes manifests (broken state)
 │   ├── deployment.yaml
 │   ├── service.yaml
@@ -362,8 +345,9 @@ description: |
   It was working fine yesterday, but now Kubernetes keeps killing it.
 theme: resources-scaling
 difficulty: easy
-estimated_time: 15
-initial_situation: |
+type: fix
+estimatedTime: 15
+initialSituation: |
   A data processing application is deployed as a single pod.
   The pod starts successfully but after a few seconds gets killed.
   It enters a CrashLoopBackOff state and keeps restarting.
@@ -372,7 +356,7 @@ objective: |
   Fix the pod so it can run without being evicted.
   Understand why Kubernetes is killing the application.
 
-validations:
+objectives:
   - key: pod-running
     title: "Pod Ready"
     description: "The data-processor pod must be running and healthy"
@@ -413,8 +397,8 @@ Before submitting a challenge:
 - [ ] The issue manifests as described (app fails as expected)
 - [ ] The intended solution fixes the problem
 - [ ] Alternative valid solutions also work (if applicable)
-- [ ] Validations pass only when the issue is actually fixed
-- [ ] Validations don't reveal the solution in titles/descriptions
+- [ ] Objectives pass only when the issue is actually fixed
+- [ ] Objectives don't reveal the solution in titles/descriptions
 - [ ] Kyverno policies prevent obvious bypasses
 - [ ] Description maintains mystery about the root cause
 - [ ] Estimated time is realistic
@@ -425,7 +409,7 @@ Before submitting a challenge:
 
 1. **Solution in the title**: "Fix Memory Limit" → "Stable Operation"
 2. **Too much context**: Explaining why something is broken
-3. **Overly specific validations**: Checking exact config values
+3. **Overly specific objectives**: Checking exact config values
 4. **Missing bypass protection**: Users can just delete and recreate resources
 5. **Unrealistic scenarios**: Problems that would never happen in production
 6. **Too many hints**: Step-by-step instructions instead of a goal

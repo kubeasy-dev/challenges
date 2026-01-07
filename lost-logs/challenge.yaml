@@ -4,9 +4,10 @@ description: |
   Some containers show logs, others don't.
 theme: monitoring-debugging
 difficulty: easy
-estimated_time: 15
-starter_friendly: true
-initial_situation: |
+type: fix
+estimatedTime: 15
+starterFriendly: true
+initialSituation: |
   A multi-container pod is deployed with a main application and a sidecar logger.
   The main application runs fine and you can see its logs with kubectl logs.
   However, the sidecar container writes logs to a file (/var/log/app.log) instead of stdout.
@@ -16,7 +17,7 @@ objective: |
   Fix the logging configuration so all container logs are visible via kubectl logs.
   Ensure logs are written to stdout/stderr following 12-factor app principles.
 
-validations:
+objectives:
   - key: check-logger-stdout
     title: "Sidecar Logs"
     description: "The logger sidecar must capture and output both 'Application log entry' and 'Logger sidecar' messages"

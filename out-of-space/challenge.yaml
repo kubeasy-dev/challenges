@@ -4,8 +4,9 @@ description: |
   They all want the same thing, but apparently they can't all have it.
 theme: volumes-secrets
 difficulty: medium
-estimated_time: 20
-initial_situation: |
+type: fix
+estimatedTime: 20
+initialSituation: |
   A PostgreSQL StatefulSet was running fine with a single replica.
   To improve availability, the team scaled it to 3 replicas.
   The first pod is Running normally, but pods 2 and 3 are stuck in Pending.
@@ -14,7 +15,7 @@ objective: |
   Figure out why scaling breaks the deployment and get things working again.
   Not every problem is solved by throwing more replicas at it.
 
-validations:
+objectives:
   - key: all-postgres-pods-ready
     title: "All Pods Ready"
     description: "All postgres pods must be in Ready state"
@@ -38,10 +39,10 @@ validations:
       target:
         kind: StatefulSet
         name: postgres
-      metricChecks:
-        - metric: readyReplicas
+      checks:
+        - field: readyReplicas
           operator: Equals
           value: 3
-        - metric: availableReplicas
+        - field: availableReplicas
           operator: Equals
           value: 3

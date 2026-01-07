@@ -1,23 +1,36 @@
 /**
  * Challenge validation module
- * Provides schema validation for challenge data
+ * Uses remote JSON schema as single source of truth
  */
 
-// Challenge schema definition
-const challengeSchema = {
-  title: { type: 'string', required: true, maxLength: 255 },
-  description: { type: 'string', required: true },
-  theme: { type: 'string', required: true },
-  difficulty: {
-    type: 'string',
-    required: true,
-    enum: ['easy', 'medium', 'hard']
-  },
-  estimated_time: { type: 'number', required: true, min: 1 },
-  initial_situation: { type: 'string', required: true },
-  objective: { type: 'string', required: true },
-  of_the_week: { type: 'boolean', required: false }
-};
+const Ajv2020 = require("ajv/dist/2020");
+
+// Remote schema URL - single source of truth
+const SCHEMA_URL = "https://kubeasy.dev/api/schemas/challenge";
+
+// Cache for the schema to avoid repeated fetches
+let cachedSchema = null;
+
+/**
+ * Fetches the challenge schema from the remote URL
+ * @returns {Promise<Object>} The JSON schema
+ */
+async function fetchRemoteSchema() {
+  if (cachedSchema) {
+    return cachedSchema;
+  }
+
+  try {
+    const response = await fetch(SCHEMA_URL);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch schema: ${response.status} ${response.statusText}`);
+    }
+    cachedSchema = await response.json();
+    return cachedSchema;
+  } catch (error) {
+    throw new Error(`Cannot fetch remote schema from ${SCHEMA_URL}: ${error.message}`);
+  }
+}
 
 /**
  * Validates that a theme exists using the API
@@ -33,61 +46,53 @@ async function validateThemeExists(themeSlug) {
 }
 
 /**
- * Validates a challenge object against the schema
+ * Validates a challenge object against the remote JSON schema
  * @param {Object} challenge - The challenge data to validate
  * @returns {Promise<Array>} Promise that resolves to array of validation error messages
  */
 async function validateChallenge(challenge) {
   const errors = [];
 
-  for (const [field, rules] of Object.entries(challengeSchema)) {
-    const value = challenge[field];
+  try {
+    // Fetch the remote schema
+    const schema = await fetchRemoteSchema();
 
-    // Check required fields
-    if (rules.required && (value === undefined || value === null || value === '')) {
-      errors.push(`Missing required field: ${field}`);
-      continue;
-    }
+    // Create Ajv2020 instance with support for formats and defaults
+    const ajv = new Ajv2020({
+      allErrors: true,
+      strict: false,
+      useDefaults: true
+    });
 
-    // Skip validation if field is optional and not provided
-    if (!rules.required && (value === undefined || value === null)) {
-      continue;
-    }
+    // Compile and validate
+    const validate = ajv.compile(schema);
+    const valid = validate(challenge);
 
-    // Type validation
-    if (rules.type === 'string' && typeof value !== 'string') {
-      errors.push(`Field ${field} must be a string`);
-    } else if (rules.type === 'number' && typeof value !== 'number') {
-      errors.push(`Field ${field} must be a number`);
-    } else if (rules.type === 'boolean' && typeof value !== 'boolean') {
-      errors.push(`Field ${field} must be a boolean`);
+    if (!valid && validate.errors) {
+      for (const error of validate.errors) {
+        const path = error.instancePath || "(root)";
+        const message = error.message || "Unknown validation error";
+        errors.push(`${path}: ${message}`);
+      }
     }
-
-    // String length validation
-    if (rules.maxLength && typeof value === 'string' && value.length > rules.maxLength) {
-      errors.push(`Field ${field} exceeds maximum length of ${rules.maxLength}`);
-    }
-
-    // Number range validation
-    if (rules.min && typeof value === 'number' && value < rules.min) {
-      errors.push(`Field ${field} must be at least ${rules.min}`);
-    }
-
-    // Enum validation
-    if (rules.enum && !rules.enum.includes(value)) {
-      errors.push(`Field ${field} must be one of: ${rules.enum.join(', ')}`);
-    }
-  }
-
-  // Special validation for theme field - check if it exists in database
-  if (challenge.theme && typeof challenge.theme === 'string') {
-    const themeExists = await validateThemeExists(challenge.theme);
-    if (!themeExists) {
-      errors.push(`Theme '${challenge.theme}' does not exist in the database`);
-    }
+  } catch (error) {
+    errors.push(`Schema validation error: ${error.message}`);
   }
 
   return errors;
 }
 
-module.exports = { validateChallenge, validateThemeExists, challengeSchema };
+/**
+ * Clears the cached schema (useful for testing)
+ */
+function clearSchemaCache() {
+  cachedSchema = null;
+}
+
+module.exports = {
+  validateChallenge,
+  validateThemeExists,
+  fetchRemoteSchema,
+  clearSchemaCache,
+  SCHEMA_URL
+};

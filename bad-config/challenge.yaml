@@ -4,9 +4,10 @@ description: |
   The pods are living in the past.
 theme: pods-containers
 difficulty: easy
-estimated_time: 15
-starter_friendly: true
-initial_situation: |
+type: fix
+estimatedTime: 15
+starterFriendly: true
+initialSituation: |
   A web application is deployed with its configuration in a ConfigMap.
   The team updated the ConfigMap to enable a new feature flag.
   Checking the ConfigMap shows the new values are definitely there.
@@ -15,7 +16,7 @@ objective: |
   Make sure configuration changes actually reach the running application.
   Future config updates shouldn't silently fail like this.
 
-validations:
+objectives:
   - key: pod-ready-check
     title: "Pod Ready"
     description: "The web-app pod must be running and in Ready state"

@@ -2,8 +2,9 @@ title: Probes Drift
 description: The app works perfectly in local tests. In Kubernetes? It never stays up long enough to find out.
 theme: monitoring-debugging
 difficulty: medium
-estimated_time: 15
-initial_situation: |
+type: fix
+estimatedTime: 15
+initialSituation: |
   A notification service was deployed with health checks configured.
   The container starts, begins initialization, but Kubernetes keeps restarting it in a loop.
   There's no application error in the logs - it just keeps getting killed mid-startup.
@@ -11,7 +12,7 @@ objective: |
   Stop the crash loop and get the service running.
   The app is fine - something about how Kubernetes checks its health isn't right.
 
-validations:
+objectives:
   - key: app-ready-check
     title: "Pod Ready Check"
     description: "The notify-service pod must be in Ready state with healthy liveness and readiness probes"

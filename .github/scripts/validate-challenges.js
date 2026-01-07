@@ -136,8 +136,8 @@ async function validateSingleChallenge(challengeFolder) {
     const warnings = [];
     
     // Check for recommended fields
-    if (!challengeData.initial_situation || challengeData.initial_situation.trim().length < 10) {
-      warnings.push("Consider adding a more detailed initial_situation");
+    if (!challengeData.initialSituation || challengeData.initialSituation.trim().length < 10) {
+      warnings.push("Consider adding a more detailed initialSituation");
     }
     
     if (!challengeData.objective || challengeData.objective.trim().length < 10) {
@@ -145,8 +145,8 @@ async function validateSingleChallenge(challengeFolder) {
     }
     
     // Check estimated time is reasonable
-    if (challengeData.estimated_time < 5 || challengeData.estimated_time > 120) {
-      warnings.push(`Estimated time (${challengeData.estimated_time}min) seems unusual. Consider reviewing.`);
+    if (challengeData.estimatedTime < 5 || challengeData.estimatedTime > 120) {
+      warnings.push(`Estimated time (${challengeData.estimatedTime}min) seems unusual. Consider reviewing.`);
     }
     
     // Check if manifests directory exists
@@ -181,9 +181,10 @@ async function validateSingleChallenge(challengeFolder) {
     
     console.log(`✅ Challenge ${challengeFolder} is valid`);
     console.log(`   Title: "${challengeData.title}"`);
+    console.log(`   Type: ${challengeData.type}`);
     console.log(`   Theme: ${challengeData.theme}`);
     console.log(`   Difficulty: ${challengeData.difficulty}`);
-    console.log(`   Estimated time: ${challengeData.estimated_time} minutes`);
+    console.log(`   Estimated time: ${challengeData.estimatedTime} minutes`);
     
     return true;
     

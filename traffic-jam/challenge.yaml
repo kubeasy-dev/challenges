@@ -4,8 +4,9 @@ description: |
   Something invisible is blocking the traffic.
 theme: networking
 difficulty: hard
-estimated_time: 20
-initial_situation: |
+type: fix
+estimatedTime: 20
+initialSituation: |
   A microservice was deployed behind an Ingress controller for external access.
   The pods are Running and respond perfectly when accessed directly.
   The Service configuration looks correct and matches the pod labels.
@@ -14,7 +15,7 @@ objective: |
   Find what's breaking the traffic flow from Ingress to pods.
   Everything looks right on paper - dig deeper.
 
-validations:
+objectives:
   - key: pods-ready-check
     title: "API Pods Ready"
     description: "All API pods must be running and in Ready state"
@@ -54,7 +55,5 @@ validations:
           app: api-service
       targets:
         - url: "http://ingress-nginx-controller.ingress-nginx.svc.cluster.local"
-          headers:
-            Host: "api.example.com"
           expectedStatusCode: 200
           timeoutSeconds: 5
