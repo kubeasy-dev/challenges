@@ -12,34 +12,25 @@ initialSituation: |
   The Ingress controller (nginx) is already installed.
   You need to make the app accessible over HTTPS at app.kubeasy.local.
 
-  A self-signed certificate has been generated for you:
-  - Certificate: /tmp/tls.crt (copy from the certificate-files ConfigMap)
-  - Key: /tmp/tls.key (copy from the certificate-files ConfigMap)
+  You will need to generate a self-signed certificate for app.kubeasy.local.
+  Hint: Use openssl to generate a certificate and key.
 objective: |
   Create a TLS Secret with the provided certificate.
   Configure an Ingress to serve HTTPS traffic for app.kubeasy.local.
   The application should be accessible via HTTPS.
 
 objectives:
-  - key: tls-secret-exists
-    title: "TLS Secret Created"
-    description: "A kubernetes.io/tls Secret must exist with the certificate"
+  - key: pod-ready
+    title: "App Running"
+    description: "The webapp must be running and healthy"
     order: 1
     type: status
     spec:
       target:
-        kind: Secret
-        name: app-tls-secret
-      conditions: []
-
-  - key: ingress-exists
-    title: "Ingress Configured"
-    description: "An Ingress with TLS configuration must exist"
-    order: 2
-    type: status
-    spec:
-      target:
-        kind: Ingress
-        name: app-ingress
-      conditions: []
+        kind: Pod
+        labelSelector:
+          app: webapp
+      conditions:
+        - type: Ready
+          status: "True"
 
