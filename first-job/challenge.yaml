@@ -16,34 +16,24 @@ objective: |
   The Job should use the busybox image and simulate the migration with a sleep command.
 
 objectives:
-  - key: job-exists
-    title: "Job Created"
-    description: "A migration Job must exist in the namespace"
-    order: 1
-    type: status
-    spec:
-      target:
-        kind: Job
-        name: db-migration
-      conditions: []
-
   - key: job-complete
     title: "Job Completed"
-    description: "The migration Job must reach Complete status"
-    order: 2
-    type: status
+    description: "The migration Job must complete successfully"
+    order: 1
+    type: metrics
     spec:
       target:
         kind: Job
         name: db-migration
-      conditions:
-        - type: Complete
-          status: "True"
+      checks:
+        - field: status.succeeded
+          operator: ">="
+          value: 1
 
   - key: migration-output
     title: "Migration Output"
     description: "The Job must output the expected completion message"
-    order: 3
+    order: 2
     type: log
     spec:
       target:

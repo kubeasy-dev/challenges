@@ -16,23 +16,10 @@ objective: |
   The app exposes a /health endpoint that returns 200 when healthy.
 
 objectives:
-  - key: deployment-exists
-    title: "Deployment Configured"
-    description: "The web-app Deployment must be properly configured"
-    order: 1
-    type: status
-    spec:
-      target:
-        kind: Deployment
-        name: web-app
-      conditions:
-        - type: Available
-          status: "True"
-
   - key: pod-ready
     title: "Pod Ready"
     description: "The web-app pod must be running and passing health checks"
-    order: 2
+    order: 1
     type: status
     spec:
       target:
@@ -46,7 +33,7 @@ objectives:
   - key: no-restarts
     title: "Stable Operation"
     description: "The pod should not restart due to failed health checks"
-    order: 3
+    order: 2
     type: metrics
     spec:
       target:

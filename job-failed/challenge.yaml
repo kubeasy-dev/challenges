@@ -19,17 +19,18 @@ objective: |
 objectives:
   - key: job-completion-check
     title: "Job Completed"
-    description: "The data-processor Job must reach 'Complete' status"
+    description: "The data-processor Job must complete successfully"
     order: 1
-    type: status
+    type: metrics
     spec:
       target:
         kind: Job
         labelSelector:
           app: data-processor
-      conditions:
-        - type: Complete
-          status: "True"
+      checks:
+        - field: status.succeeded
+          operator: ">="
+          value: 1
 
   - key: job-logs-check
     title: "Job Logs Check"
