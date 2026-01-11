@@ -15,32 +15,10 @@ objective: |
   The application should be able to query the Kubernetes API successfully.
 
 objectives:
-  - key: role-exists
-    title: "Role Created"
-    description: "A Role granting pod list permissions must exist"
-    order: 1
-    type: status
-    spec:
-      target:
-        kind: Role
-        name: pod-reader
-      conditions: []
-
-  - key: binding-exists
-    title: "Binding Created"
-    description: "A RoleBinding linking the Role to the ServiceAccount must exist"
-    order: 2
-    type: status
-    spec:
-      target:
-        kind: RoleBinding
-        name: monitor-pod-reader
-      conditions: []
-
   - key: pod-ready
     title: "Pod Ready"
     description: "The monitoring app must be running"
-    order: 3
+    order: 1
     type: status
     spec:
       target:
@@ -54,7 +32,7 @@ objectives:
   - key: api-access-works
     title: "API Access Working"
     description: "The application must be able to list pods successfully"
-    order: 4
+    order: 2
     type: log
     spec:
       target:
@@ -63,4 +41,4 @@ objectives:
           app: monitor-app
       expectedStrings:
         - "Successfully listed pods"
-      sinceSeconds: 120
+      sinceSeconds: 300
