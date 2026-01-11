@@ -37,7 +37,7 @@ objectives:
     spec:
       sourcePod:
         labelSelector:
-          app: webapp
+          app: test-client
       targets:
         - url: "http://webapp-service:8080"
           expectedStatusCode: 200
