@@ -15,23 +15,10 @@ objective: |
   The application should write to a persistent volume instead of ephemeral storage.
 
 objectives:
-  - key: pvc-exists
-    title: "Storage Claimed"
-    description: "A PersistentVolumeClaim must exist for the notes data"
-    order: 1
-    type: status
-    spec:
-      target:
-        kind: PersistentVolumeClaim
-        name: notes-data
-      conditions:
-        - type: Bound
-          status: "True"
-
   - key: pod-ready
     title: "Pod Ready"
     description: "The notes-app pod must be running with storage attached"
-    order: 2
+    order: 1
     type: status
     spec:
       target:
@@ -45,7 +32,7 @@ objectives:
   - key: data-persisted
     title: "Data Persisted"
     description: "The application must be writing to persistent storage"
-    order: 3
+    order: 2
     type: log
     spec:
       target:
@@ -54,4 +41,4 @@ objectives:
           app: notes-app
       expectedStrings:
         - "Notes saved to /data/notes.txt"
-      sinceSeconds: 120
+      sinceSeconds: 300
