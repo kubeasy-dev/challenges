@@ -1,0 +1,38 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: protect-monitor-app
+  namespace: grant-access
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: preserve-service-account
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["monitor-app"]
+      validate:
+        message: "Cannot change the ServiceAccount - grant permissions to monitor-sa instead"
+        pattern:
+          spec:
+            template:
+              spec:
+                serviceAccountName: "monitor-sa"
+
+    - name: preserve-container-image
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["monitor-app"]
+      validate:
+        message: "Cannot change the container image - configure RBAC instead"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: monitor
+                    image: "curlimages/curl:8.5.0"

@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: configurable-app
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: configurable-app
+  template:
+    metadata:
+      labels:
+        app: configurable-app
+    spec:
+      containers:
+        - name: app
+          image: busybox:1.36
+          command: ["/bin/sh"]
+          args:
+            - "-c"
+            - |
+              echo "Starting application..."
+
+              # Check if required environment variables are set
+              if [ -z "$APP_NAME" ] || [ -z "$APP_ENV" ]; then
+                echo "ERROR: APP_NAME and APP_ENV not configured"
+                echo "Please set these environment variables to continue."
+                exit 1
+              fi
+
+              echo "Configuration loaded successfully"
+              echo "APP_NAME: $APP_NAME"
+              echo "APP_ENV: $APP_ENV"
+              echo "Application is running!"
+
+              # Keep container running
+              while true; do
+                echo "App is healthy - $(date)"
+                sleep 30
+              done
+          # NOTE: Environment variables need to be added here from a ConfigMap
+          # env:
+          #   - name: APP_NAME
+          #     valueFrom:
+          #       configMapKeyRef:
+          #         name: app-config
+          #         key: app_name
+          resources:
+            requests:
+              cpu: "25m"
+              memory: "16Mi"
+            limits:
+              cpu: "50m"
+              memory: "32Mi"

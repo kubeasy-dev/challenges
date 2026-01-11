@@ -1,19 +1,20 @@
 title: Access Pending
 description: |
-  The app was deployed, the image looks fine, but nothing starts.
-  Dig into what happens before the first log line ever appears.
+  The new deployment went out, the pod is Running, but it never becomes Ready.
+  The startup probe keeps failing with a mysterious "Forbidden" error.
 theme: rbac-security
 difficulty: hard
 type: fix
 estimatedTime: 15
 initialSituation: |
-  A recent deployment was pushed using the usual CI process, with a custom image and a startup probe.
-  The application doesn't seem to be running as expected.
-  You're now responsible for diagnosing and unlocking the situation — but without modifying the image or bypassing any critical settings.
+  A new application was deployed that needs to query the Kubernetes API during startup.
+  The pod status shows Running, but the Ready condition stays False.
+  kubectl describe pod shows the startup probe is failing repeatedly.
+  Looking at the logs, you see: "Error querying API: forbidden - User cannot list pods".
+  The application uses a ServiceAccount, but something about the permissions is wrong.
 objective: |
-  Ensure the application starts correctly and that the Pod becomes Ready.
-  Something is blocking the startup sequence — your job is to identify the root cause
-  and adjust the current configuration so the rollout can complete successfully.
+  Investigate why the application can't access the Kubernetes API.
+  Fix the configuration so the startup probe passes and the pod becomes Ready.
 
 objectives:
   - key: pod-ready-check

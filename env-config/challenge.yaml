@@ -1,0 +1,60 @@
+title: Environment Config
+description: |
+  The application is deployed but complains about missing configuration.
+  It needs some settings from the environment to work properly.
+theme: volumes-secrets
+difficulty: easy
+type: build
+estimatedTime: 15
+starterFriendly: true
+initialSituation: |
+  A web application has been deployed to the namespace.
+  When you check the logs, you see: "ERROR: APP_NAME and APP_ENV not configured".
+  The application expects configuration via environment variables.
+  You need to provide these settings using Kubernetes ConfigMaps.
+objective: |
+  Create a ConfigMap with the required configuration values.
+  Inject the ConfigMap values as environment variables in the deployment.
+  The application should start successfully with the configuration loaded.
+
+objectives:
+  - key: configmap-exists
+    title: "ConfigMap Created"
+    description: "A ConfigMap with application settings must exist"
+    order: 1
+    type: status
+    spec:
+      target:
+        kind: ConfigMap
+        name: app-config
+      conditions: []
+
+  - key: app-configured
+    title: "App Configured"
+    description: "The application must read configuration from environment"
+    order: 2
+    type: log
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: configurable-app
+      expectedStrings:
+        - "Configuration loaded successfully"
+        - "APP_NAME:"
+        - "APP_ENV:"
+      sinceSeconds: 120
+
+  - key: pod-ready
+    title: "App Running"
+    description: "The application must be running and healthy"
+    order: 3
+    type: status
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: configurable-app
+      conditions:
+        - type: Ready
+          status: "True"

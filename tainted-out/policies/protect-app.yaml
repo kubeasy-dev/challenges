@@ -1,0 +1,25 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: protect-critical-app
+  namespace: tainted-out
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: preserve-container-image
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["critical-app"]
+      validate:
+        message: "Cannot change the container image - fix the scheduling issue"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: app
+                    image: "busybox:1.36"

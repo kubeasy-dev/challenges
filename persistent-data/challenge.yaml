@@ -1,0 +1,57 @@
+title: Persistent Data
+description: |
+  Containers are ephemeral - when they restart, their data vanishes.
+  Some applications need storage that survives pod restarts.
+theme: volumes-secrets
+difficulty: medium
+type: build
+estimatedTime: 20
+initialSituation: |
+  A note-taking application is deployed but loses all notes when the pod restarts.
+  The application stores notes in /data/notes.txt.
+  Users are complaining that their notes keep disappearing.
+objective: |
+  Add persistent storage so notes survive pod restarts.
+  The application should write to a persistent volume instead of ephemeral storage.
+
+objectives:
+  - key: pvc-exists
+    title: "Storage Claimed"
+    description: "A PersistentVolumeClaim must exist for the notes data"
+    order: 1
+    type: status
+    spec:
+      target:
+        kind: PersistentVolumeClaim
+        name: notes-data
+      conditions:
+        - type: Bound
+          status: "True"
+
+  - key: pod-ready
+    title: "Pod Ready"
+    description: "The notes-app pod must be running with storage attached"
+    order: 2
+    type: status
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: notes-app
+      conditions:
+        - type: Ready
+          status: "True"
+
+  - key: data-persisted
+    title: "Data Persisted"
+    description: "The application must be writing to persistent storage"
+    order: 3
+    type: log
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: notes-app
+      expectedStrings:
+        - "Notes saved to /data/notes.txt"
+      sinceSeconds: 120

@@ -1,0 +1,44 @@
+title: Expose Internally
+description: |
+  The application is running, but other services in the cluster can't reach it.
+  It needs to be accessible from within the cluster.
+theme: pods-containers
+difficulty: easy
+type: build
+estimatedTime: 10
+starterFriendly: true
+initialSituation: |
+  A web application is deployed and running in the namespace.
+  The pods are healthy and serving traffic on port 8080.
+  However, there's no way for other pods to reach this application.
+  You need to make it accessible using a Kubernetes Service.
+objective: |
+  Create a Service to expose the web application internally.
+  Other pods in the cluster should be able to reach it using the service name.
+
+objectives:
+  - key: service-exists
+    title: "Service Created"
+    description: "A Service must exist to expose the webapp"
+    order: 1
+    type: status
+    spec:
+      target:
+        kind: Service
+        labelSelector:
+          app: webapp
+      conditions: []
+
+  - key: service-reachable
+    title: "Service Reachable"
+    description: "The webapp must be reachable through the Service"
+    order: 2
+    type: connectivity
+    spec:
+      sourcePod:
+        labelSelector:
+          app: webapp
+      targets:
+        - url: "http://webapp-service:8080"
+          expectedStatusCode: 200
+          timeoutSeconds: 5

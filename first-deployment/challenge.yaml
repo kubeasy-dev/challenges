@@ -1,0 +1,60 @@
+title: First Deployment
+description: |
+  Your team has asked you to deploy a simple web server to Kubernetes.
+  The namespace is ready and waiting - now it's your turn to deploy.
+theme: pods-containers
+difficulty: easy
+type: build
+estimatedTime: 15
+starterFriendly: true
+initialSituation: |
+  You've been given access to a Kubernetes namespace called "first-deployment".
+  The namespace is empty - no resources have been created yet.
+  Your task is to deploy a web application using a Deployment.
+  The application should use the nginx:1.25 image and expose port 80.
+objective: |
+  Create a Deployment named "web-server" that runs the nginx:1.25 image.
+  The Deployment should have at least 1 replica and expose port 80.
+  The pods must be running and ready.
+
+objectives:
+  - key: deployment-exists
+    title: "Deployment Created"
+    description: "A Deployment named web-server must exist in the namespace"
+    order: 1
+    type: status
+    spec:
+      target:
+        kind: Deployment
+        name: web-server
+      conditions:
+        - type: Available
+          status: "True"
+
+  - key: pods-ready
+    title: "Pods Running"
+    description: "The web-server pods must be running and ready"
+    order: 2
+    type: status
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: web-server
+      conditions:
+        - type: Ready
+          status: "True"
+
+  - key: nginx-logs
+    title: "Server Started"
+    description: "The nginx server must have started successfully"
+    order: 3
+    type: log
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: web-server
+      expectedStrings:
+        - "start worker process"
+      sinceSeconds: 120

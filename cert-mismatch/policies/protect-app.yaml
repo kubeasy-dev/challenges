@@ -1,0 +1,37 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: protect-secure-app
+  namespace: cert-mismatch
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: preserve-container-image
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["secure-app"]
+      validate:
+        message: "Cannot change the container image - fix the TLS configuration"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: app
+                    image: "hashicorp/http-echo:0.2.3"
+
+    - name: preserve-ingress-rules-host
+      match:
+        resources:
+          kinds: ["Ingress"]
+          names: ["secure-app"]
+      validate:
+        message: "Cannot change the Ingress rules host - fix the TLS hosts"
+        pattern:
+          spec:
+            rules:
+              - host: "app.example.com"

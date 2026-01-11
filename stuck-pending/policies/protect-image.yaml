@@ -1,0 +1,24 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: protect-data-app
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: preserve-container-image
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["data-app"]
+      validate:
+        message: "Cannot change the container image - the scheduling is the issue"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: app
+                    image: "busybox:1.36"

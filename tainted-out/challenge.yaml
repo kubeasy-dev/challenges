@@ -1,0 +1,45 @@
+title: Tainted Out
+description: |
+  The pod can't schedule. Something about the nodes is blocking it.
+  Events mention taints but the meaning is unclear.
+theme: scheduling-affinity
+difficulty: medium
+type: fix
+estimatedTime: 20
+initialSituation: |
+  A critical application pod stays Pending indefinitely.
+  Running kubectl describe pod shows taint-related errors.
+  The node appears to have resources available.
+  Other system pods are running fine on the same node.
+objective: |
+  Understand why this pod can't schedule and fix it.
+  The application should run on the available nodes.
+
+objectives:
+  - key: pod-ready
+    title: "Pod Running"
+    description: "The critical-app pod must be running and ready"
+    order: 1
+    type: status
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: critical-app
+      conditions:
+        - type: Ready
+          status: "True"
+
+  - key: app-logs
+    title: "App Started"
+    description: "The application must have started successfully"
+    order: 2
+    type: log
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: critical-app
+      expectedStrings:
+        - "Critical app running"
+      sinceSeconds: 120

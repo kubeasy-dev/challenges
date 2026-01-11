@@ -1,0 +1,55 @@
+title: First Job
+description: |
+  Not everything runs forever. Some tasks just need to run once and finish.
+  Time to learn about Kubernetes Jobs.
+theme: jobs-cronjobs
+difficulty: easy
+type: build
+estimatedTime: 15
+starterFriendly: true
+initialSituation: |
+  The team needs to run a one-time database migration script.
+  The script takes about 30 seconds to complete and outputs "Migration complete!" when done.
+  A namespace has been prepared for this task.
+objective: |
+  Create a Kubernetes Job that runs the migration script to completion.
+  The Job should use the busybox image and simulate the migration with a sleep command.
+
+objectives:
+  - key: job-exists
+    title: "Job Created"
+    description: "A migration Job must exist in the namespace"
+    order: 1
+    type: status
+    spec:
+      target:
+        kind: Job
+        name: db-migration
+      conditions: []
+
+  - key: job-complete
+    title: "Job Completed"
+    description: "The migration Job must reach Complete status"
+    order: 2
+    type: status
+    spec:
+      target:
+        kind: Job
+        name: db-migration
+      conditions:
+        - type: Complete
+          status: "True"
+
+  - key: migration-output
+    title: "Migration Output"
+    description: "The Job must output the expected completion message"
+    order: 3
+    type: log
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          job-name: db-migration
+      expectedStrings:
+        - "Migration complete!"
+      sinceSeconds: 300

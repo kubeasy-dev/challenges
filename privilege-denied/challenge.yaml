@@ -1,20 +1,19 @@
 title: Privilege Denied
 description: |
-  A legacy application that used to run with special privileges now fails to start.
-  Security policies have been enforced, and the deployment needs updating.
+  A legacy application that used to run fine suddenly refuses to start.
+  The container never gets to run any code - it's blocked before it even begins.
 theme: rbac-security
 difficulty: medium
 type: fix
 estimatedTime: 20
 initialSituation: |
-  A legacy application was deployed and worked fine initially.
-  After implementing Pod Security Standards at the cluster level, the pod fails to start.
-  The error message shows: "Error: container has runAsNonRoot and image will run as root".
-  The deployment is configured to run as root, which is now blocked by security policies.
-  The pod also writes to the root filesystem, which is not allowed.
+  A legacy application was deployed and worked fine for months.
+  After a recent cluster update, the pod fails to start.
+  The container shows a cryptic error and never reaches the Running state.
+  The exact same image works on other clusters.
 objective: |
-  Update the deployment's SecurityContext to comply with Pod Security Standards.
-  Make the application run as a non-root user and use a read-only root filesystem.
+  Investigate why the pod is being blocked from starting.
+  Make the application run successfully in this cluster's security environment.
 
 objectives:
   - key: pod-ready-check

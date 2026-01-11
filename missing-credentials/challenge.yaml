@@ -1,0 +1,46 @@
+title: Missing Credentials
+description: |
+  A microservice can't connect to the database - it says the password is missing.
+  But the Secret is right there in the namespace. What's going on?
+theme: volumes-secrets
+difficulty: medium
+type: fix
+estimatedTime: 20
+initialSituation: |
+  A new microservice was deployed that needs to connect to a PostgreSQL database.
+  The database credentials are stored in a Kubernetes Secret called "db-credentials".
+  Running kubectl get secret db-credentials shows the Secret exists with the expected keys.
+  However, the pod keeps crashing with: "DATABASE_PASSWORD environment variable not set".
+  The deployment YAML references the Secret, but the environment variable is empty.
+objective: |
+  Fix the deployment configuration so the database credentials are properly injected.
+  The application expects: DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD as environment variables.
+
+objectives:
+  - key: pod-ready-check
+    title: "Pod Ready"
+    description: "The api-service pod must be running and in Ready state"
+    order: 1
+    type: status
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: api-service
+      conditions:
+        - type: Ready
+          status: "True"
+
+  - key: database-connection-check
+    title: "Database Connection"
+    description: "The api-service must successfully connect to the database"
+    order: 2
+    type: log
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: api-service
+      expectedStrings:
+        - "Connected to database successfully"
+      sinceSeconds: 120

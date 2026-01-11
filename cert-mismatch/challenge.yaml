@@ -1,0 +1,42 @@
+title: Certificate Mismatch
+description: |
+  HTTPS is configured but browsers show security warnings.
+  The certificate seems valid, but something is wrong.
+theme: ingress-tls
+difficulty: hard
+type: fix
+estimatedTime: 20
+initialSituation: |
+  An Ingress is configured with TLS for the domain app.example.com.
+  The certificate Secret exists and contains valid TLS data.
+  When accessing the site, browsers show "Certificate name mismatch" errors.
+  The application works fine over HTTP, only HTTPS has issues.
+objective: |
+  Fix the TLS configuration so HTTPS works without certificate warnings.
+  The application should be accessible at https://app.example.com.
+
+objectives:
+  - key: ingress-configured
+    title: "Ingress Ready"
+    description: "The Ingress must be properly configured for TLS"
+    order: 1
+    type: status
+    spec:
+      target:
+        kind: Ingress
+        name: secure-app
+      conditions: []
+
+  - key: pod-ready
+    title: "App Running"
+    description: "The application pods must be running"
+    order: 2
+    type: status
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: secure-app
+      conditions:
+        - type: Ready
+          status: "True"

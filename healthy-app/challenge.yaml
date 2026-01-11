@@ -1,0 +1,59 @@
+title: Healthy App
+description: |
+  Kubernetes needs to know if your app is alive and ready.
+  Without health checks, it's flying blind.
+theme: monitoring-debugging
+difficulty: easy
+type: build
+estimatedTime: 15
+starterFriendly: true
+initialSituation: |
+  A simple web server is deployed but has no health checks configured.
+  Kubernetes has no way to know if the application is healthy.
+  If the app freezes or becomes unresponsive, nothing will detect it.
+objective: |
+  Configure health checks so Kubernetes can detect issues automatically.
+  The app exposes a /health endpoint that returns 200 when healthy.
+
+objectives:
+  - key: deployment-exists
+    title: "Deployment Configured"
+    description: "The web-app Deployment must be properly configured"
+    order: 1
+    type: status
+    spec:
+      target:
+        kind: Deployment
+        name: web-app
+      conditions:
+        - type: Available
+          status: "True"
+
+  - key: pod-ready
+    title: "Pod Ready"
+    description: "The web-app pod must be running and passing health checks"
+    order: 2
+    type: status
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: web-app
+      conditions:
+        - type: Ready
+          status: "True"
+
+  - key: no-restarts
+    title: "Stable Operation"
+    description: "The pod should not restart due to failed health checks"
+    order: 3
+    type: metrics
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: web-app
+      checks:
+        - field: restartCount
+          operator: LessThan
+          value: 2

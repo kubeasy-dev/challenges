@@ -1,0 +1,66 @@
+title: Grant Access
+description: |
+  Your app needs to talk to the Kubernetes API.
+  But by default, pods can't do much - you have to grant permissions explicitly.
+theme: rbac-security
+difficulty: medium
+type: build
+estimatedTime: 20
+initialSituation: |
+  A monitoring application needs to list pods in its namespace.
+  The app uses a dedicated ServiceAccount, but it has no permissions.
+  When the app tries to list pods, it gets "Forbidden" errors.
+objective: |
+  Grant the ServiceAccount permission to list pods in its namespace.
+  The application should be able to query the Kubernetes API successfully.
+
+objectives:
+  - key: role-exists
+    title: "Role Created"
+    description: "A Role granting pod list permissions must exist"
+    order: 1
+    type: status
+    spec:
+      target:
+        kind: Role
+        name: pod-reader
+      conditions: []
+
+  - key: binding-exists
+    title: "Binding Created"
+    description: "A RoleBinding linking the Role to the ServiceAccount must exist"
+    order: 2
+    type: status
+    spec:
+      target:
+        kind: RoleBinding
+        name: monitor-pod-reader
+      conditions: []
+
+  - key: pod-ready
+    title: "Pod Ready"
+    description: "The monitoring app must be running"
+    order: 3
+    type: status
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: monitor-app
+      conditions:
+        - type: Ready
+          status: "True"
+
+  - key: api-access-works
+    title: "API Access Working"
+    description: "The application must be able to list pods successfully"
+    order: 4
+    type: log
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: monitor-app
+      expectedStrings:
+        - "Successfully listed pods"
+      sinceSeconds: 120

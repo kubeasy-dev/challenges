@@ -1,0 +1,38 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: protect-frontend-deployment
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: preserve-deployment-labels
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["frontend"]
+      validate:
+        message: "Cannot change the Deployment labels - fix the Service selector instead"
+        pattern:
+          spec:
+            template:
+              metadata:
+                labels:
+                  app: frontend
+
+    - name: preserve-container-image
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["frontend"]
+      validate:
+        message: "Cannot change the container image"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: frontend
+                    image: "nginx:1.25-alpine"

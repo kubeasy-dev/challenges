@@ -1,0 +1,45 @@
+title: TLS Ingress
+description: |
+  The application needs to be accessible over HTTPS.
+  A secure connection is required for production traffic.
+theme: ingress-tls
+difficulty: hard
+type: build
+estimatedTime: 25
+initialSituation: |
+  A web application is deployed and running in the cluster.
+  A Service exposes it internally on port 80.
+  The Ingress controller (nginx) is already installed.
+  You need to make the app accessible over HTTPS at app.kubeasy.local.
+
+  A self-signed certificate has been generated for you:
+  - Certificate: /tmp/tls.crt (copy from the certificate-files ConfigMap)
+  - Key: /tmp/tls.key (copy from the certificate-files ConfigMap)
+objective: |
+  Create a TLS Secret with the provided certificate.
+  Configure an Ingress to serve HTTPS traffic for app.kubeasy.local.
+  The application should be accessible via HTTPS.
+
+objectives:
+  - key: tls-secret-exists
+    title: "TLS Secret Created"
+    description: "A kubernetes.io/tls Secret must exist with the certificate"
+    order: 1
+    type: status
+    spec:
+      target:
+        kind: Secret
+        name: app-tls-secret
+      conditions: []
+
+  - key: ingress-exists
+    title: "Ingress Configured"
+    description: "An Ingress with TLS configuration must exist"
+    order: 2
+    type: status
+    spec:
+      target:
+        kind: Ingress
+        name: app-ingress
+      conditions: []
+
