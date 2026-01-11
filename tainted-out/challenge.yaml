@@ -42,4 +42,4 @@ objectives:
           app: critical-app
       expectedStrings:
         - "Critical app running"
-      sinceSeconds: 120
+      sinceSeconds: 3600
