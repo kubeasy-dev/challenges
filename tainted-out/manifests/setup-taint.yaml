@@ -51,7 +51,7 @@ spec:
         - operator: Exists
       containers:
         - name: taint-setup
-          image: bitnami/kubectl:1.31
+          image: bitnami/kubectl:latest
           command:
             - /bin/sh
             - -c
