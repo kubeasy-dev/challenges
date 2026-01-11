@@ -30,17 +30,17 @@ objectives:
         - type: Ready
           status: "True"
 
-  - key: no-restarts
-    title: "Stable Operation"
-    description: "The pod should not restart due to failed health checks"
+  - key: probes-configured
+    title: "Health Checks Configured"
+    description: "The pod must have probes configured and be healthy"
     order: 2
-    type: metrics
+    type: event
     spec:
       target:
         kind: Pod
         labelSelector:
           app: web-app
-      checks:
-        - field: restartCount
-          operator: LessThan
-          value: 2
+      forbiddenReasons:
+        - "Unhealthy"
+        - "BackOff"
+      sinceSeconds: 120
