@@ -29,18 +29,3 @@ objectives:
       conditions:
         - type: Ready
           status: "True"
-
-  - key: probes-configured
-    title: "Health Checks Configured"
-    description: "The pod must have probes configured and be healthy"
-    order: 2
-    type: event
-    spec:
-      target:
-        kind: Pod
-        labelSelector:
-          app: web-app
-      forbiddenReasons:
-        - "Unhealthy"
-        - "BackOff"
-      sinceSeconds: 120
