@@ -51,13 +51,13 @@ spec:
         - operator: Exists
       containers:
         - name: taint-setup
-          image: bitnami/kubectl:1.28
+          image: bitnami/kubectl:1.31
           command:
             - /bin/sh
             - -c
             - |
-              echo "Adding taint to worker nodes..."
-              for node in $(kubectl get nodes -o name | grep -v control-plane); do
+              echo "Adding taint to nodes..."
+              for node in $(kubectl get nodes -o name); do
                 kubectl taint nodes ${node#node/} dedicated=special:NoSchedule --overwrite || true
                 echo "Tainted $node"
               done
