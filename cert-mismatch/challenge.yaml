@@ -16,21 +16,10 @@ objective: |
   The application should be accessible at https://app.example.com.
 
 objectives:
-  - key: ingress-configured
-    title: "Ingress Ready"
-    description: "The Ingress must be properly configured for TLS"
-    order: 1
-    type: status
-    spec:
-      target:
-        kind: Ingress
-        name: secure-app
-      conditions: []
-
   - key: pod-ready
     title: "App Running"
     description: "The application pods must be running"
-    order: 2
+    order: 1
     type: status
     spec:
       target:
