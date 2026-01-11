@@ -18,21 +18,10 @@ objective: |
   The application should start successfully with the configuration loaded.
 
 objectives:
-  - key: configmap-exists
-    title: "ConfigMap Created"
-    description: "A ConfigMap with application settings must exist"
-    order: 1
-    type: status
-    spec:
-      target:
-        kind: ConfigMap
-        name: app-config
-      conditions: []
-
   - key: app-configured
     title: "App Configured"
     description: "The application must read configuration from environment"
-    order: 2
+    order: 1
     type: log
     spec:
       target:
@@ -43,12 +32,12 @@ objectives:
         - "Configuration loaded successfully"
         - "APP_NAME:"
         - "APP_ENV:"
-      sinceSeconds: 120
+      sinceSeconds: 300
 
   - key: pod-ready
     title: "App Running"
     description: "The application must be running and healthy"
-    order: 3
+    order: 2
     type: status
     spec:
       target:
