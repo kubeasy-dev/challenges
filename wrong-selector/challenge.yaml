@@ -1,0 +1,46 @@
+title: Wrong Selector
+description: |
+  The Service exists but can't find any backend pods.
+  Requests to the service timeout, yet the pods are running fine.
+theme: pods-containers
+difficulty: easy
+type: fix
+estimatedTime: 10
+starterFriendly: true
+initialSituation: |
+  A web application was deployed with a Deployment and Service.
+  The pods are Running and healthy when checked directly.
+  However, the Service shows 0 endpoints.
+  Requests to the Service timeout with "no route to host".
+objective: |
+  Make the Service route traffic to the pods.
+  The application should be reachable through the Service.
+
+objectives:
+  - key: service-has-endpoints
+    title: "Service Connected"
+    description: "The Service must have endpoints pointing to the pods"
+    order: 1
+    type: connectivity
+    spec:
+      sourcePod:
+        labelSelector:
+          app: frontend
+      targets:
+        - url: "http://frontend-service:80"
+          expectedStatusCode: 200
+          timeoutSeconds: 5
+
+  - key: pods-ready
+    title: "Pods Ready"
+    description: "All frontend pods must be running and healthy"
+    order: 2
+    type: condition
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: frontend
+      checks:
+        - type: Ready
+          status: "True"

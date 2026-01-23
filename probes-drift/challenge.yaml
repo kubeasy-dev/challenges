@@ -17,12 +17,12 @@ objectives:
     title: "Pod Ready Check"
     description: "The notify-service pod must be in Ready state with healthy liveness and readiness probes"
     order: 1
-    type: status
+    type: condition
     spec:
       target:
         kind: Pod
         labelSelector:
           app: notify-service
-      conditions:
+      checks:
         - type: Ready
           status: "True"

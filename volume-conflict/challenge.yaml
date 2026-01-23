@@ -1,0 +1,48 @@
+title: Volume Conflict
+description: |
+  Scaling worked... partially. One pod is happy, the others are stuck.
+  They all want the same storage, but apparently they can't all have it.
+theme: volumes-secrets
+difficulty: medium
+type: fix
+estimatedTime: 20
+initialSituation: |
+  A PostgreSQL StatefulSet was running fine with a single replica.
+  To improve availability, the team scaled it to 3 replicas.
+  The first pod is Running normally, but pods 2 and 3 are stuck in Pending.
+  The events mention something about volumes, but all PersistentVolumeClaims show as Bound.
+objective: |
+  Figure out why scaling breaks the deployment and get things working again.
+  Not every problem is solved by throwing more replicas at it.
+
+objectives:
+  - key: all-postgres-pods-ready
+    title: "All Pods Ready"
+    description: "All postgres pods must be in Ready state"
+    order: 1
+    type: condition
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: postgres
+      checks:
+        - type: Ready
+          status: "True"
+
+  - key: statefulset-replicas-check
+    title: "StatefulSet Replicas"
+    description: "The postgres StatefulSet must have exactly 3 ready and available replicas"
+    order: 2
+    type: status
+    spec:
+      target:
+        kind: StatefulSet
+        name: postgres
+      checks:
+        - field: readyReplicas
+          operator: "=="
+          value: 3
+        - field: availableReplicas
+          operator: "=="
+          value: 3

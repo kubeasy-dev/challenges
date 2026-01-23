@@ -1,23 +1,25 @@
 title: Job Failed
 description: |
   The nightly data processing job has been failing for the past week.
-  It used to work fine, but now it times out and gets killed by Kubernetes.
+  It starts, runs for a while, then suddenly disappears.
 theme: jobs-cronjobs
 difficulty: medium
 type: fix
 estimatedTime: 15
 initialSituation: |
   A CronJob that processes data every night has been consistently failing.
-  The job starts running but gets terminated before completion.
-  The processing logic hasn't changed, but something in the cluster configuration is causing issues.
+  Looking at the Job status, you see it has failed multiple times.
+  The pod runs for about 30 seconds, then gets terminated.
+  kubectl describe job shows "DeadlineExceeded" in the events.
+  The data processing script itself takes about 60 seconds to complete.
 objective: |
-  Investigate why the nightly job keeps failing and restore normal operation.
-  The processing workflow should complete successfully every night.
+  Investigate why the job keeps getting terminated and fix the configuration.
+  The processing workflow must complete successfully.
 
 objectives:
   - key: job-completion-check
     title: "Job Completed"
-    description: "The data-processor Job must reach 'Complete' status"
+    description: "The data-processor Job must complete successfully"
     order: 1
     type: status
     spec:
@@ -25,9 +27,10 @@ objectives:
         kind: Job
         labelSelector:
           app: data-processor
-      conditions:
-        - type: Complete
-          status: "True"
+      checks:
+        - field: succeeded
+          operator: ">="
+          value: 1
 
   - key: job-logs-check
     title: "Job Logs Check"

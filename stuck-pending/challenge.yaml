@@ -1,0 +1,59 @@
+title: Stuck Pending
+description: |
+  The pod refuses to start. It's been Pending for minutes.
+  The cluster has available nodes, but something is blocking scheduling.
+theme: scheduling-affinity
+difficulty: medium
+type: fix
+estimatedTime: 15
+initialSituation: |
+  A new application was deployed but the pod stays in Pending state.
+  Running kubectl describe pod shows events about node selection.
+  The cluster has nodes with available resources.
+  Other pods in the namespace are running fine.
+objective: |
+  Investigate why the pod can't be scheduled.
+  Fix the configuration so the pod starts running.
+
+objectives:
+  - key: pod-scheduled
+    title: "Pod Scheduled"
+    description: "The data-app pod must be scheduled to a node"
+    order: 1
+    type: condition
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: data-app
+      checks:
+        - type: PodScheduled
+          status: "True"
+
+  - key: pod-ready
+    title: "Pod Running"
+    description: "The data-app pod must be running and ready"
+    order: 2
+    type: condition
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: data-app
+      checks:
+        - type: Ready
+          status: "True"
+
+  - key: app-logs
+    title: "App Started"
+    description: "The application must have started successfully"
+    order: 3
+    type: log
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: data-app
+      expectedStrings:
+        - "Application started"
+      sinceSeconds: 120

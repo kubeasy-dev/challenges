@@ -1,0 +1,36 @@
+title: TLS Ingress
+description: |
+  The application needs to be accessible over HTTPS.
+  A secure connection is required for production traffic.
+theme: ingress-tls
+difficulty: hard
+type: build
+estimatedTime: 25
+initialSituation: |
+  A web application is deployed and running in the cluster.
+  A Service exposes it internally on port 80.
+  The Ingress controller (nginx) is already installed.
+  You need to make the app accessible over HTTPS at app.kubeasy.local.
+
+  You will need to generate a self-signed certificate for app.kubeasy.local.
+  Hint: Use openssl to generate a certificate and key.
+objective: |
+  Create a TLS Secret with the provided certificate.
+  Configure an Ingress to serve HTTPS traffic for app.kubeasy.local.
+  The application should be accessible via HTTPS.
+
+objectives:
+  - key: pod-ready
+    title: "App Running"
+    description: "The webapp must be running and healthy"
+    order: 1
+    type: condition
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: webapp
+      checks:
+        - type: Ready
+          status: "True"
+

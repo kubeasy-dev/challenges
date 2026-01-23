@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: critical-app
+  namespace: tainted-out
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: critical-app
+  template:
+    metadata:
+      labels:
+        app: critical-app
+    spec:
+      # BUG: Missing toleration for the "dedicated=special:NoSchedule" taint
+      # The user needs to add:
+      # tolerations:
+      #   - key: "dedicated"
+      #     operator: "Equal"
+      #     value: "special"
+      #     effect: "NoSchedule"
+      containers:
+        - name: app
+          image: busybox:1.36
+          command: ["/bin/sh"]
+          args:
+            - "-c"
+            - |
+              echo "Critical app running"
+              echo "Processing critical tasks..."
+              while true; do
+                echo "Still running - $(date)"
+                sleep 60
+              done
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "32Mi"
+            limits:
+              cpu: "100m"
+              memory: "64Mi"

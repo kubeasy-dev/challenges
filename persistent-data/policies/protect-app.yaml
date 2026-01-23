@@ -1,0 +1,25 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: protect-notes-app
+  namespace: persistent-data
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: preserve-container-image
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["notes-app"]
+      validate:
+        message: "Cannot change the container image - add persistent storage instead"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: app
+                    image: "busybox:1.36"

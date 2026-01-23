@@ -22,13 +22,13 @@ objectives:
     title: "Pod Ready"
     description: "The data-processor pod must be running and in Ready state"
     order: 1
-    type: status
+    type: condition
     spec:
       target:
         kind: Pod
         labelSelector:
           app: data-processor
-      conditions:
+      checks:
         - type: Ready
           status: "True"
 
@@ -52,13 +52,13 @@ objectives:
     title: "Low Restart Count"
     description: "The data-processor pod must have fewer than 3 restarts (stable operation)"
     order: 3
-    type: metrics
+    type: status
     spec:
       target:
         kind: Pod
         labelSelector:
           app: data-processor
       checks:
-        - field: restartCount
-          operator: LessThan
+        - field: containerStatuses[0].restartCount
+          operator: "<"
           value: 3
