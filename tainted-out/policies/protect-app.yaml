@@ -4,7 +4,7 @@ metadata:
   name: protect-critical-app
   namespace: tainted-out
   annotations:
-    argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   validationFailureAction: Enforce
   background: true

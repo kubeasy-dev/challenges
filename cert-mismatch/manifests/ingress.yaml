@@ -4,7 +4,7 @@ metadata:
   name: app-tls
   namespace: cert-mismatch
   annotations:
-    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-wave: "1"
 type: kubernetes.io/tls
 data:
   # Self-signed certificate for api.example.com (WRONG CN - should be app.example.com)

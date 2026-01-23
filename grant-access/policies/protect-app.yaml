@@ -4,7 +4,7 @@ metadata:
   name: protect-monitor-app
   namespace: grant-access
   annotations:
-    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   validationFailureAction: Enforce
   background: true

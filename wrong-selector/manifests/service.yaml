@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: frontend-service
   annotations:
-    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   selector:
     app: front-end  # BUG: should be "frontend" (no hyphen)
