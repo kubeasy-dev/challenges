@@ -20,13 +20,13 @@ objectives:
     title: "All Pods Ready"
     description: "All postgres pods must be in Ready state"
     order: 1
-    type: status
+    type: condition
     spec:
       target:
         kind: Pod
         labelSelector:
           app: postgres
-      conditions:
+      checks:
         - type: Ready
           status: "True"
 
@@ -34,15 +34,15 @@ objectives:
     title: "StatefulSet Replicas"
     description: "The postgres StatefulSet must have exactly 3 ready and available replicas"
     order: 2
-    type: metrics
+    type: status
     spec:
       target:
         kind: StatefulSet
         name: postgres
       checks:
         - field: readyReplicas
-          operator: Equals
+          operator: "=="
           value: 3
         - field: availableReplicas
-          operator: Equals
+          operator: "=="
           value: 3

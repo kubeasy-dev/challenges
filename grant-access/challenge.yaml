@@ -19,13 +19,13 @@ objectives:
     title: "Pod Ready"
     description: "The monitoring app must be running"
     order: 1
-    type: status
+    type: condition
     spec:
       target:
         kind: Pod
         labelSelector:
           app: monitor-app
-      conditions:
+      checks:
         - type: Ready
           status: "True"
 

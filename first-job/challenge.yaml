@@ -20,13 +20,13 @@ objectives:
     title: "Job Completed"
     description: "The migration Job must complete successfully"
     order: 1
-    type: metrics
+    type: status
     spec:
       target:
         kind: Job
         name: db-migration
       checks:
-        - field: status.succeeded
+        - field: succeeded
           operator: ">="
           value: 1
 

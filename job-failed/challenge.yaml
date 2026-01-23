@@ -21,14 +21,14 @@ objectives:
     title: "Job Completed"
     description: "The data-processor Job must complete successfully"
     order: 1
-    type: metrics
+    type: status
     spec:
       target:
         kind: Job
         labelSelector:
           app: data-processor
       checks:
-        - field: status.succeeded
+        - field: succeeded
           operator: ">="
           value: 1
 

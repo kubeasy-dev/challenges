@@ -21,13 +21,13 @@ objectives:
     title: "Pod Ready"
     description: "The startup-app pod must be running and in Ready state"
     order: 1
-    type: status
+    type: condition
     spec:
       target:
         kind: Pod
         labelSelector:
           app: startup-app
-      conditions:
+      checks:
         - type: Ready
           status: "True"
 

@@ -38,12 +38,12 @@ objectives:
     title: "App Running"
     description: "The application must be running and healthy"
     order: 2
-    type: status
+    type: condition
     spec:
       target:
         kind: Pod
         labelSelector:
           app: configurable-app
-      conditions:
+      checks:
         - type: Ready
           status: "True"

@@ -22,13 +22,13 @@ objectives:
     title: "Pods Running"
     description: "The web-server pods must be running and ready"
     order: 1
-    type: status
+    type: condition
     spec:
       target:
         kind: Pod
         labelSelector:
           app: web-server
-      conditions:
+      checks:
         - type: Ready
           status: "True"
 

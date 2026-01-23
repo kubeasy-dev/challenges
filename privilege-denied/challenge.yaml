@@ -20,12 +20,12 @@ objectives:
     title: "Pod Ready"
     description: "The legacy-app pod must be running and in Ready state"
     order: 1
-    type: status
+    type: condition
     spec:
       target:
         kind: Pod
         labelSelector:
           app: legacy-app
-      conditions:
+      checks:
         - type: Ready
           status: "True"

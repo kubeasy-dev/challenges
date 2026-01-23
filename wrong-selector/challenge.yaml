@@ -35,12 +35,12 @@ objectives:
     title: "Pods Ready"
     description: "All frontend pods must be running and healthy"
     order: 2
-    type: status
+    type: condition
     spec:
       target:
         kind: Pod
         labelSelector:
           app: frontend
-      conditions:
+      checks:
         - type: Ready
           status: "True"

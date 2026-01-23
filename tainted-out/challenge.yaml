@@ -20,13 +20,13 @@ objectives:
     title: "Pod Running"
     description: "The critical-app pod must be running and ready"
     order: 1
-    type: status
+    type: condition
     spec:
       target:
         kind: Pod
         labelSelector:
           app: critical-app
-      conditions:
+      checks:
         - type: Ready
           status: "True"
 

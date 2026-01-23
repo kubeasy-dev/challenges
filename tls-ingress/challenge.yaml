@@ -24,13 +24,13 @@ objectives:
     title: "App Running"
     description: "The webapp must be running and healthy"
     order: 1
-    type: status
+    type: condition
     spec:
       target:
         kind: Pod
         labelSelector:
           app: webapp
-      conditions:
+      checks:
         - type: Ready
           status: "True"
 

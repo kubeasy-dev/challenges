@@ -20,13 +20,13 @@ objectives:
     title: "Pod Scheduled"
     description: "The data-app pod must be scheduled to a node"
     order: 1
-    type: status
+    type: condition
     spec:
       target:
         kind: Pod
         labelSelector:
           app: data-app
-      conditions:
+      checks:
         - type: PodScheduled
           status: "True"
 
@@ -34,13 +34,13 @@ objectives:
     title: "Pod Running"
     description: "The data-app pod must be running and ready"
     order: 2
-    type: status
+    type: condition
     spec:
       target:
         kind: Pod
         labelSelector:
           app: data-app
-      conditions:
+      checks:
         - type: Ready
           status: "True"
 

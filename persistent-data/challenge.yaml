@@ -19,13 +19,13 @@ objectives:
     title: "Pod Ready"
     description: "The notes-app pod must be running with storage attached"
     order: 1
-    type: status
+    type: condition
     spec:
       target:
         kind: Pod
         labelSelector:
           app: notes-app
-      conditions:
+      checks:
         - type: Ready
           status: "True"
 

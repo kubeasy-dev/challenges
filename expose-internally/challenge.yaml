@@ -17,22 +17,10 @@ objective: |
   Other pods in the cluster should be able to reach it using the service name.
 
 objectives:
-  - key: service-exists
-    title: "Service Created"
-    description: "A Service must exist to expose the webapp"
-    order: 1
-    type: status
-    spec:
-      target:
-        kind: Service
-        labelSelector:
-          app: webapp
-      conditions: []
-
   - key: service-reachable
     title: "Service Reachable"
     description: "The webapp must be reachable through the Service"
-    order: 2
+    order: 1
     type: connectivity
     spec:
       sourcePod:

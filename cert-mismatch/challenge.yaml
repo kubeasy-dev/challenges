@@ -20,12 +20,12 @@ objectives:
     title: "App Running"
     description: "The application pods must be running"
     order: 1
-    type: status
+    type: condition
     spec:
       target:
         kind: Pod
         labelSelector:
           app: secure-app
-      conditions:
+      checks:
         - type: Ready
           status: "True"
