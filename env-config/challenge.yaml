@@ -38,7 +38,7 @@ objectives:
     title: "App Running"
     description: "The application must be running and healthy"
     order: 2
-    type: condition
+    type: status
     spec:
       target:
         kind: Pod

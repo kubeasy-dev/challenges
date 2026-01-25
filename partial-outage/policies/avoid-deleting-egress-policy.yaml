@@ -1,17 +1,23 @@
 apiVersion: kyverno.io/v1
 kind: Policy
 metadata:
-  name: avoid-deny-delete-networkpolicy
+  name: protect-deny-all-networkpolicy
   annotations:
     argocd.argoproj.io/sync-wave: "2"
 spec:
-  validationFailureAction: enforce
+  validationFailureAction: Enforce
+  background: false
   rules:
     - name: block-delete-deny-all
       match:
-        resources:
-          kinds: ["NetworkPolicy"]
-          names: ["deny-all"]
+        any:
+          - resources:
+              kinds:
+                - NetworkPolicy
+              names:
+                - deny-all
+              operations:
+                - DELETE
       validate:
-        message: "You are not allowed to delete the default NetworkPolicy"
+        message: "Deleting the deny-all NetworkPolicy is not allowed. Add ingress rules instead."
         deny: {}

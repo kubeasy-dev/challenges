@@ -40,13 +40,6 @@ spec:
                 echo "App is healthy - $(date)"
                 sleep 30
               done
-          # NOTE: Environment variables need to be added here from a ConfigMap
-          # env:
-          #   - name: APP_NAME
-          #     valueFrom:
-          #       configMapKeyRef:
-          #         name: app-config
-          #         key: app_name
           resources:
             requests:
               cpu: "25m"
