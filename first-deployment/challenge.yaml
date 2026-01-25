@@ -11,10 +11,10 @@ initialSituation: |
   You've been given access to a Kubernetes namespace called "first-deployment".
   The namespace is empty - no resources have been created yet.
   Your task is to deploy a web application using a Deployment.
-  The application should use the nginx:1.25 image and expose port 80.
+  The application should use the nginx:1.25 image.
 objective: |
   Create a Deployment named "web-server" that runs the nginx:1.25 image.
-  The Deployment should have at least 1 replica and expose port 80.
+  The Deployment should have at least 1 replica.
   The pods must be running and ready.
 
 objectives:
