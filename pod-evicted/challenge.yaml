@@ -9,13 +9,12 @@ estimatedTime: 15
 starterFriendly: true
 initialSituation: |
   A data processing application is deployed as a single pod.
-  The pod starts successfully but after a few seconds gets OOMKilled (Out of Memory).
+  The pod starts but keeps crashing after a few seconds.
   It enters a CrashLoopBackOff state and keeps restarting.
-  The application code hasn't changed, but Kubernetes is now enforcing resource limits.
-  The pod's memory usage exceeds the configured limit, causing eviction.
+  The application code hasn't changed - it was working fine in the previous environment.
 objective: |
-  Fix the resource configuration so the pod can run without being evicted.
-  Understand the difference between requests and limits, and how Kubernetes manages resources.
+  Investigate why the pod keeps crashing and fix it so it runs stably.
+  The pod should stay running without being killed by the system.
 
 objectives:
   - key: pod-running-check
