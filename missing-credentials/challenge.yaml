@@ -8,10 +8,10 @@ type: fix
 estimatedTime: 20
 initialSituation: |
   A new microservice was deployed that needs to connect to a PostgreSQL database.
-  The database credentials are stored in a Kubernetes Secret called "db-credentials".
-  Running kubectl get secret db-credentials shows the Secret exists with the expected keys.
-  However, the pod keeps crashing with: "DATABASE_PASSWORD environment variable not set".
-  The deployment YAML references the Secret, but the environment variable is empty.
+  The database credentials are stored in a Kubernetes Secret called "database-credentials".
+  Running kubectl get secret shows the Secret exists with the expected keys.
+  However, the pod keeps crashing with: "DATABASE_USER environment variable not set".
+  The Secret is there, but the pod isn't receiving the credentials properly.
 objective: |
   Fix the deployment configuration so the database credentials are properly injected.
   The application expects: DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD as environment variables.
