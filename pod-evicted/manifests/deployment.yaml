@@ -52,13 +52,7 @@ spec:
             limits:
               cpu: "200m"
               memory: "50Mi"
-          livenessProbe:
-            exec:
-              command:
-                - /bin/sh
-                - -c
-                - "ps aux | grep python3 | grep -v grep"
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            failureThreshold: 3
+          env:
+            - name: PYTHONUNBUFFERED
+              value: "1"
       restartPolicy: Always
