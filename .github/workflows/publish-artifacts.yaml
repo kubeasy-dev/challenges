@@ -1,0 +1,107 @@
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**/challenge.yaml'
+      - '**/manifests/**'
+      - '**/policies/**'
+  workflow_dispatch:
+
+name: Publish OCI Artifacts
+
+permissions:
+  packages: write
+  contents: read
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.filter-challenges.outputs.matrix }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: "0"
+
+      - name: Get changed files
+        id: changed-files
+        if: github.event_name != 'workflow_dispatch'
+        uses: tj-actions/changed-files@v46
+        with:
+          since_last_remote_commit: true
+          dir_names: true
+          dir_names_max_depth: 1
+          matrix: true
+
+      - name: Filter challenges
+        id: filter-challenges
+        run: |
+          filtered_dirs='[]'
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "Manual trigger - publishing all challenges"
+            for dir in */; do
+              dir=${dir%/}
+              if [[ "$dir" == ".github" || "$dir" == "node_modules" ]]; then
+                continue
+              fi
+              if [[ -f "$dir/challenge.yaml" ]]; then
+                echo "Found challenge: $dir"
+                filtered_dirs=$(echo "$filtered_dirs" | jq -c ". += [\"$dir\"]")
+              fi
+            done
+          else
+            echo "Push event - publishing only changed challenges"
+            changed_dirs='${{ steps.changed-files.outputs.all_changed_files }}'
+            echo "Raw changed directories: $changed_dirs"
+            for dir in $(echo "$changed_dirs" | jq -r '.[]'); do
+              if [[ "$dir" == ".github" || "$dir" == "node_modules" ]]; then
+                echo "Skipping $dir"
+                continue
+              fi
+              if [[ -f "$dir/challenge.yaml" ]]; then
+                echo "Found challenge: $dir"
+                filtered_dirs=$(echo "$filtered_dirs" | jq -c ". += [\"$dir\"]")
+              else
+                echo "No challenge.yaml in $dir, skipping"
+              fi
+            done
+          fi
+
+          echo "Challenges to publish: $filtered_dirs"
+          echo "matrix=$filtered_dirs" >> $GITHUB_OUTPUT
+
+  push-artifact:
+    runs-on: ubuntu-latest
+    needs: detect
+    if: ${{ needs.detect.outputs.matrix != '[]' && needs.detect.outputs.matrix != '' }}
+    strategy:
+      matrix:
+        challenge: ${{ fromJson(needs.detect.outputs.matrix) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup ORAS
+        uses: oras-project/setup-oras@v1
+
+      - name: Login to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Push OCI artifact
+        run: |
+          cd "${{ matrix.challenge }}"
+
+          FILES="challenge.yaml:application/vnd.kubeasy.challenge.v1+yaml"
+          FILES="$FILES manifests/:application/vnd.kubeasy.manifests.v1.tar+gzip"
+
+          if [[ -d "policies" ]]; then
+            FILES="$FILES policies/:application/vnd.kubeasy.policies.v1.tar+gzip"
+          fi
+
+          REPO="ghcr.io/kubeasy-dev/challenges/${{ matrix.challenge }}"
+          SHA="${{ github.sha }}"
+
+          oras push "$REPO:latest,$SHA" $FILES
