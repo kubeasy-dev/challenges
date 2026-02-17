@@ -5,7 +5,6 @@ theme: networking
 difficulty: easy
 type: fix
 estimatedTime: 10
-starterFriendly: true
 initialSituation: |
   A frontend Deployment with 2 replicas and a backend Deployment with 1 replica are deployed in the same namespace.
   A NetworkPolicy is defined, but users still report issues — possibly related to intra-cluster communication.

@@ -6,7 +6,6 @@ theme: pods-containers
 difficulty: easy
 type: build
 estimatedTime: 15
-starterFriendly: true
 initialSituation: |
   You've been given access to a Kubernetes namespace called "first-deployment".
   The namespace is empty - no resources have been created yet.

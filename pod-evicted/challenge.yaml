@@ -6,7 +6,6 @@ theme: resources-scaling
 difficulty: easy
 type: fix
 estimatedTime: 15
-starterFriendly: true
 initialSituation: |
   A data processing application is deployed as a single pod.
   The pod starts but keeps crashing after a few seconds.

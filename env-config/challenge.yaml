@@ -6,7 +6,6 @@ theme: volumes-secrets
 difficulty: easy
 type: build
 estimatedTime: 15
-starterFriendly: true
 initialSituation: |
   A web application has been deployed to the namespace.
   When you check the logs, you see: "ERROR: APP_NAME and APP_ENV not configured".

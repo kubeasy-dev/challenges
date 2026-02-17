@@ -6,7 +6,6 @@ theme: jobs-cronjobs
 difficulty: easy
 type: build
 estimatedTime: 15
-starterFriendly: true
 initialSituation: |
   The team needs to run a one-time database migration script.
   The script takes about 30 seconds to complete and outputs "Migration complete!" when done.

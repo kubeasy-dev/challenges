@@ -41,7 +41,6 @@ theme: <from-mcp>
 difficulty: easy|medium|hard
 type: <from-mcp>
 estimatedTime: 15
-starterFriendly: false  # true only for easy, beginner-appropriate challenges
 
 initialSituation: |
   What the user finds when starting.

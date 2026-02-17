@@ -6,7 +6,6 @@ theme: pods-containers
 difficulty: easy
 type: build
 estimatedTime: 10
-starterFriendly: true
 initialSituation: |
   A web application is deployed and running in the namespace.
   The pods are healthy and serving traffic on port 8080.

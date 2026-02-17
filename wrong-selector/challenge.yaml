@@ -6,7 +6,6 @@ theme: pods-containers
 difficulty: easy
 type: fix
 estimatedTime: 10
-starterFriendly: true
 initialSituation: |
   A web application was deployed with a Deployment and Service.
   The pods are Running and healthy when checked directly.
