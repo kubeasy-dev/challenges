@@ -7,9 +7,6 @@ const { validateChallenge } = require("./validation");
 const API_URL = process.env.API_URL
 const API_TOKEN = process.env.API_TOKEN;
 
-// Valid validation types for objectives (matches remote schema)
-const VALID_TYPES = ["status", "log", "event", "metrics", "connectivity"];
-
 if (!API_TOKEN) {
   console.error("Missing API_TOKEN env variable");
   console.error("Set your admin API token: export API_TOKEN=your_token_here");
@@ -43,42 +40,6 @@ function findAllChallenges() {
 }
 
 /**
- * Converts a validation key to a human-readable title
- * e.g., "app-ready-check" -> "App Ready Check"
- */
-function formatDisplayName(name) {
-  return name
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}
-
-/**
- * Validates objectives from challenge data
- * Returns the raw objectives array (API expects original format)
- */
-function validateObjectives(folder, objectivesData) {
-  if (!objectivesData || !Array.isArray(objectivesData)) {
-    return [];
-  }
-
-  for (const objective of objectivesData) {
-    const key = objective.key;
-    if (!key) {
-      console.warn(`   ⚠️  ${folder}/challenge.yaml: objective missing 'key' field`);
-    }
-
-    const type = objective.type;
-    if (!type || !VALID_TYPES.includes(type)) {
-      console.warn(`   ⚠️  ${folder}/challenge.yaml: objective '${key}' has invalid type '${type}'`);
-    }
-  }
-
-  // Return raw objectives - API expects original format from challenge.yaml
-  return objectivesData;
-}
-
-/**
  * Loads and validates a single challenge from its folder
  */
 async function loadChallenge(folder) {
@@ -104,9 +65,6 @@ async function loadChallenge(folder) {
     throw new Error(`Validation errors:\n${validationErrors.join('\n')}`);
   }
 
-  // Validate objectives (returns raw format for API)
-  const objectives = validateObjectives(folder, challenge.objectives);
-
   return {
     slug: folder,
     title: challenge.title,
@@ -116,8 +74,7 @@ async function loadChallenge(folder) {
     type: challenge.type || "fix",
     estimatedTime: challenge.estimatedTime,
     initialSituation: challenge.initialSituation,
-    objective: challenge.objective,
-    objectives,
+    objectives: challenge.objectives || [],
   };
 }
 
