@@ -1,0 +1,283 @@
+name: Test Challenges (Live Cluster)
+
+on:
+  pull_request:
+    paths:
+      - '**/challenge.yaml'
+      - '**/manifests/**'
+      - '**/policies/**'
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.filter-challenges.outputs.matrix }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v46
+        with:
+          dir_names: true
+          dir_names_max_depth: 1
+          matrix: true
+
+      - name: Filter challenges
+        id: filter-challenges
+        run: |
+          filtered_dirs='[]'
+          changed_dirs='${{ steps.changed-files.outputs.all_changed_files }}'
+          echo "Raw changed directories: $changed_dirs"
+          for dir in $(echo "$changed_dirs" | jq -r '.[]'); do
+            if [[ "$dir" == ".github" || "$dir" == "node_modules" ]]; then
+              echo "Skipping $dir"
+              continue
+            fi
+            if [[ -f "$dir/challenge.yaml" ]]; then
+              echo "Found challenge: $dir"
+              filtered_dirs=$(echo "$filtered_dirs" | jq -c ". += [\"$dir\"]")
+            else
+              echo "No challenge.yaml in $dir, skipping"
+            fi
+          done
+          echo "Challenges to test: $filtered_dirs"
+          echo "matrix=$filtered_dirs" >> $GITHUB_OUTPUT
+
+  test:
+    runs-on: ubuntu-latest
+    needs: detect
+    if: ${{ needs.detect.outputs.matrix != '[]' && needs.detect.outputs.matrix != '' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        challenge: ${{ fromJson(needs.detect.outputs.matrix) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install kubeasy CLI
+        run: curl -fsSL https://download.kubeasy.dev/install.sh | KUBEASY_INSTALL_DIR=/usr/local/bin sh
+
+      - name: Lint challenge
+        id: lint
+        run: kubeasy dev lint ${{ matrix.challenge }} --dir ${{ matrix.challenge }}
+
+      - name: Check sync-wave annotations
+        id: sync-wave
+        run: |
+          SLUG="${{ matrix.challenge }}"
+          ERRORS=()
+
+          get_sync_wave() {
+            python3 << PYEOF
+          import yaml, sys
+          try:
+              with open("$1") as f:
+                  for doc in yaml.safe_load_all(f):
+                      if doc and isinstance(doc, dict) and "metadata" in doc:
+                          annotations = (doc.get("metadata") or {}).get("annotations") or {}
+                          print(annotations.get("argocd.argoproj.io/sync-wave", "none"))
+                          sys.exit(0)
+              print("none")
+          except Exception:
+              print("error")
+          PYEOF
+          }
+
+          if [ -d "$SLUG/manifests" ]; then
+            for file in "$SLUG/manifests"/*.yaml "$SLUG/manifests"/*.yml; do
+              [ -f "$file" ] || continue
+              base=$(basename "$file")
+              wave=$(get_sync_wave "$file")
+              if [ "$base" = "namespace.yaml" ] || [ "$base" = "namespace.yml" ]; then
+                expected="0"
+              else
+                expected="1"
+              fi
+              if [ "$wave" != "$expected" ]; then
+                ERRORS+=("manifests/$base: expected sync-wave \"$expected\", got \"$wave\"")
+              fi
+            done
+          fi
+
+          if [ -d "$SLUG/policies" ]; then
+            for file in "$SLUG/policies"/*.yaml "$SLUG/policies"/*.yml; do
+              [ -f "$file" ] || continue
+              base=$(basename "$file")
+              wave=$(get_sync_wave "$file")
+              if [ "$wave" != "2" ]; then
+                ERRORS+=("policies/$base: expected sync-wave \"2\", got \"$wave\"")
+              fi
+            done
+          fi
+
+          if [ ${#ERRORS[@]} -gt 0 ]; then
+            echo "Sync-wave annotation errors:"
+            for err in "${ERRORS[@]}"; do
+              echo "  • $err"
+            done
+            exit 1
+          fi
+
+          echo "All sync-wave annotations are correct"
+
+      - name: Setup Kubeasy cluster
+        uses: kubeasy-dev/setup-kubeasy@v1
+        with:
+          api-key: ${{ secrets.API_TOKEN }}
+
+      - name: Deploy challenge
+        id: deploy
+        run: kubeasy dev apply ${{ matrix.challenge }} --clean --dir ${{ matrix.challenge }}
+
+      - name: Check challenge status
+        id: status
+        continue-on-error: true
+        run: |
+          kubeasy dev status ${{ matrix.challenge }} --dir ${{ matrix.challenge }} 2>&1 | tee status-output.txt
+
+      - name: Run validations
+        id: validate
+        run: |
+          set +e
+          kubeasy dev validate ${{ matrix.challenge }} --json --dir ${{ matrix.challenge }} > validate-output.json 2>&1
+          VALIDATE_EXIT=$?
+          set -e
+
+          echo "validate_exit=$VALIDATE_EXIT" >> $GITHUB_OUTPUT
+
+          if [ "$VALIDATE_EXIT" -eq 0 ]; then
+            echo "assertions_passed=true" >> $GITHUB_OUTPUT
+          else
+            echo "assertions_passed=false" >> $GITHUB_OUTPUT
+          fi
+
+          echo "Validation output:"
+          cat validate-output.json
+
+      - name: Post PR comment
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const slug = '${{ matrix.challenge }}';
+            const lintOutcome = '${{ steps.lint.outcome }}';
+            const syncWaveOutcome = '${{ steps.sync-wave.outcome }}';
+            const deployOutcome = '${{ steps.deploy.outcome }}';
+            const validateExit = '${{ steps.validate.outputs.validate_exit }}';
+            const assertionsPassed = '${{ steps.validate.outputs.assertions_passed }}';
+            const fs = require('fs');
+
+            const icon = (outcome) => {
+              if (outcome === 'success') return '✅';
+              if (outcome === 'skipped') return '⏭️';
+              return '❌';
+            };
+
+            let validationIcon = '⏭️';
+            let validationNote = '';
+            if (deployOutcome === 'success' && validateExit !== '') {
+              if (assertionsPassed === 'true') {
+                validationIcon = '⚠️';
+                validationNote = ' *(unexpected: all validations passed — is the broken scenario missing?)*';
+              } else {
+                validationIcon = '✅';
+                validationNote = ' *(expected failures — broken scenario confirmed)*';
+              }
+            }
+
+            let statusContent = 'Status output not available.';
+            try { statusContent = fs.readFileSync('status-output.txt', 'utf8').trim(); } catch (_) {}
+
+            let validateContent = 'Validation output not available.';
+            try { validateContent = fs.readFileSync('validate-output.json', 'utf8').trim(); } catch (_) {}
+
+            const marker = `<!-- kubeasy-live-test-${slug} -->`;
+
+            const body = `${marker}
+            ## 🧪 Live Cluster Test: \`${slug}\`
+
+            | Step | Result |
+            |------|--------|
+            | Lint | ${icon(lintOutcome)} \`${lintOutcome}\` |
+            | Sync-wave | ${icon(syncWaveOutcome)} \`${syncWaveOutcome}\` |
+            | Deploy | ${icon(deployOutcome)} \`${deployOutcome}\` |
+            | Validations | ${validationIcon}${validationNote} |
+
+            <details>
+            <summary>Status output</summary>
+
+            \`\`\`
+            ${statusContent}
+            \`\`\`
+            </details>
+
+            <details>
+            <summary>Validation output (JSON)</summary>
+
+            \`\`\`json
+            ${validateContent}
+            \`\`\`
+            </details>`;
+
+            // Delete any existing comment for this challenge
+            const { data: comments } = await github.rest.issues.listComments({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+
+            for (const comment of comments) {
+              if (comment.body && comment.body.includes(marker)) {
+                await github.rest.issues.deleteComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: comment.id,
+                });
+              }
+            }
+
+            // Post updated comment
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body,
+            });
+
+  summary:
+    runs-on: ubuntu-latest
+    needs: [detect, test]
+    if: always()
+    name: Live Cluster Test Summary
+    steps:
+      - name: Report results
+        run: |
+          DETECT_RESULT="${{ needs.detect.result }}"
+          TEST_RESULT="${{ needs.test.result }}"
+
+          if [[ "$DETECT_RESULT" == "failure" ]]; then
+            echo "❌ detect job failed"
+            exit 1
+          fi
+
+          if [[ "$TEST_RESULT" == "skipped" || "$TEST_RESULT" == "" ]]; then
+            echo "ℹ️ No challenge changes detected — live tests skipped"
+            exit 0
+          fi
+
+          if [[ "$TEST_RESULT" == "failure" ]]; then
+            echo "❌ One or more challenge tests failed (lint or deploy error)"
+            exit 1
+          fi
+
+          echo "✅ All challenge live tests passed"
