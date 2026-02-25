@@ -1,3 +1,0 @@
-[2026-01-11T11:22:05+01:00] INFO: Kubeasy CLI started - logging to: kubeasy-cli.log
-[2026-01-11T11:22:05+01:00] INFO: Kubernetes clientset obtained successfully for context kind-kubeasy.
-[2026-01-11T11:22:05+01:00] INFO: Kubernetes dynamic client obtained successfully for context kind-kubeasy.

@@ -1,0 +1,66 @@
+name: Challenge Review
+
+on:
+  pull_request:
+    paths:
+      - '*/challenge.yaml'
+      - '*/manifests/**'
+      - '*/policies/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      challenges: ${{ steps.find.outputs.challenges }}
+      has_challenges: ${{ steps.find.outputs.has_challenges }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Find changed challenges
+        id: find
+        run: |
+          SLUGS=$(git diff --name-only ${{ github.event.pull_request.base.sha }} HEAD \
+            | grep -E '(challenge\.yaml|manifests/|policies/)' \
+            | sed 's|/.*||' \
+            | sort -u)
+
+          # Build JSON array for matrix
+          JSON=$(echo "$SLUGS" | jq -R -s -c 'split("\n") | map(select(length > 0))')
+
+          echo "challenges=$JSON" >> $GITHUB_OUTPUT
+          echo "has_challenges=$([ "$JSON" != "[]" ] && echo true || echo false)" >> $GITHUB_OUTPUT
+          echo "Detected challenges: $JSON"
+
+  review:
+    needs: detect
+    if: needs.detect.outputs.has_challenges == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        slug: ${{ fromJson(needs.detect.outputs.challenges) }}
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Kubeasy
+        uses: kubeasy-dev/setup-kubeasy@v1.0.1
+        with:
+          api-key: ${{ secrets.API_TOKEN }}
+
+      - name: Review ${{ matrix.slug }}
+        uses: anthropics/claude-code-action@v1.0.60
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: "/review-challenge SLUG: ${{ matrix.slug }}"
+          claude_args: |
+            --dangerously-skip-permissions
+          show_full_output: true
