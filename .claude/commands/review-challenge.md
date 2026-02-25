@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(kubeasy-cli*),Bash(kubectl*),Bash(cat*),Bash(grep*),Bash(ls*),Bash(sleep*),Bash(head*),Bash(tail*),Read,Write,Edit
+allowed-tools: Bash(kubeasy*),Bash(kubectl*),Bash(cat*),Bash(grep*),Bash(ls*),Bash(sleep*),Bash(head*),Bash(tail*),Read,Write,Edit
 description: Review a Kubeasy challenge for quality, pedagogy, and bypass resistance
 ---
 
@@ -32,7 +32,7 @@ You must experience the challenge as a learner first.
 Run structural validation before deploying anything:
 
 ```bash
-kubeasy-cli dev lint <slug>
+kubeasy dev lint <slug>
 ```
 
 If lint fails → **stop the review immediately**, score 0/20, verdict ❌ Fail.
@@ -41,15 +41,15 @@ Write the PR comment with lint errors and exit.
 ### Phase 3: Deploy and Verify Broken State
 
 ```bash
-kubeasy-cli dev apply <slug> --clean
+kubeasy dev apply <slug> --clean
 sleep 10
-kubeasy-cli dev status <slug>
+kubeasy dev status <slug>
 ```
 
 **Then immediately run validations:**
 
 ```bash
-kubeasy-cli dev validate <slug>
+kubeasy dev validate <slug>
 ```
 
 All validations MUST FAIL at this point. This confirms the broken state is real.
@@ -74,7 +74,7 @@ kubectl get events -n <slug> --sort-by='.lastTimestamp'
 
 1. Form a hypothesis about what's wrong
 2. Apply a fix using `kubectl`
-3. Verify with `kubeasy-cli dev validate <slug>`
+3. Verify with `kubeasy dev validate <slug>`
 
 **Maximum 5 attempts.** If you can't solve it after 5 tries, flag the challenge and continue.
 
@@ -83,7 +83,7 @@ kubectl get events -n <slug> --sort-by='.lastTimestamp'
 Reset to broken state:
 
 ```bash
-kubeasy-cli dev apply <slug> --clean
+kubeasy dev apply <slug> --clean
 sleep 10
 ```
 
@@ -167,7 +167,7 @@ Write a spoiler-free PR comment to `review-<slug>-pr-comment.md` in the current 
 ### Phase 10: Clean up
 
 ```bash
-kubeasy-cli dev clean <slug>
+kubeasy dev clean <slug>
 ```
 
 ## Spoiler-Free Writing Guide
