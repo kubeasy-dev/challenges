@@ -1,0 +1,93 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: protect-cascading-blackout
+  namespace: cascading-blackout
+spec:
+  validationFailureAction: Enforce
+  rules:
+    - name: preserve-gateway-image
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["edge-proxy"]
+      validate:
+        message: "Cannot change the edge proxy image"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: edge-proxy
+                    image: "nginx:1.25-alpine"
+
+    - name: preserve-backend-image
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["order-backend"]
+      validate:
+        message: "Cannot change the backend application image"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: order-backend
+                    image: "busybox:1.36"
+
+    - name: preserve-cache-image
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["order-cache"]
+      validate:
+        message: "Cannot change the cache image"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: redis
+                    image: "redis:7-alpine"
+
+    - name: prevent-netpol-deletion
+      match:
+        resources:
+          kinds: ["NetworkPolicy"]
+      validate:
+        message: "NetworkPolicies cannot be deleted — they are part of the security requirements. Fix them instead."
+        deny:
+          conditions:
+            any:
+              - key: "{{ request.operation }}"
+                operator: Equals
+                value: "DELETE"
+
+    - name: preserve-gateway-policy
+      match:
+        resources:
+          kinds: ["NetworkPolicy"]
+          names: ["gateway-policy"]
+      validate:
+        message: "The gateway NetworkPolicy is correctly configured and should not be modified"
+        deny:
+          conditions:
+            any:
+              - key: "{{ request.operation }}"
+                operator: Equals
+                value: "UPDATE"
+
+    - name: preserve-gateway-config
+      match:
+        resources:
+          kinds: ["ConfigMap"]
+          names: ["gateway-config"]
+      validate:
+        message: "Cannot modify the gateway configuration"
+        deny:
+          conditions:
+            any:
+              - key: "{{ request.operation }}"
+                operator: Equals
+                value: "UPDATE"

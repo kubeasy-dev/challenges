@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-backend
+  namespace: cascading-blackout
+  labels:
+    app: order-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-backend
+  template:
+    metadata:
+      labels:
+        app: order-backend
+    spec:
+      containers:
+        - name: order-backend
+          image: busybox:1.36
+          ports:
+            - containerPort: 8080
+          command:
+            - /bin/sh
+            - -c
+            - |
+              # Simple HTTP server that checks cache connectivity
+              while true; do
+                # Try to connect to cache
+                if nc -z -w2 order-cache 6379 2>/dev/null; then
+                  echo "[$(date)] ready to accept connections"
+                else
+                  echo "[$(date)] ERROR: cannot reach cache at order-cache:6379"
+                fi
+                # Serve HTTP health endpoint
+                echo -e "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nok" | nc -l -p 8080 -w5 || true
+              done
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-backend
+  namespace: cascading-blackout
+spec:
+  selector:
+    app: order-backend
+  ports:
+    - port: 8080
+      targetPort: 8080
