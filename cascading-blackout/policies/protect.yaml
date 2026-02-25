@@ -3,8 +3,11 @@ kind: Policy
 metadata:
   name: protect-cascading-blackout
   namespace: cascading-blackout
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   validationFailureAction: Enforce
+  background: true
   rules:
     - name: preserve-gateway-image
       match:

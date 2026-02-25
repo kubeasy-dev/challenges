@@ -16,8 +16,8 @@ initialSituation: |
   - A backend application that processes orders and caches results
   - A Redis cache used by the backend for session and order data
   Each tier has its own Deployment, Service, and pods are running.
-  NetworkPolicies were recently added to lock down inter-service communication.
-  The edge proxy health check works, but end-to-end order requests fail.
+  After a recent infrastructure change, the edge proxy health check still works,
+  but end-to-end order requests fail.
 
 objective: |
   Restore full end-to-end communication across the platform.
@@ -82,24 +82,10 @@ objectives:
           expectedStatusCode: 200
           timeoutSeconds: 5
 
-  - key: backend-to-cache
-    title: "Backend Reaches Cache"
-    description: "The backend must be able to connect to the cache service"
-    order: 5
-    type: connectivity
-    spec:
-      sourcePod:
-        labelSelector:
-          app: order-backend
-      targets:
-        - url: "http://order-cache:6379"
-          expectedStatusCode: 0
-          timeoutSeconds: 5
-
   - key: backend-healthy
     title: "Backend Fully Operational"
     description: "The backend reports healthy status including cache connectivity"
-    order: 6
+    order: 5
     type: log
     spec:
       target:
