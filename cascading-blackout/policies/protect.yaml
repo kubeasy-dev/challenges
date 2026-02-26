@@ -81,6 +81,34 @@ spec:
                 operator: Equals
                 value: "UPDATE"
 
+    - name: preserve-backend-policy
+      match:
+        resources:
+          kinds: ["NetworkPolicy"]
+          names: ["backend-policy"]
+      validate:
+        message: "The backend NetworkPolicy cannot be modified. You can create additional NetworkPolicy resources to extend its connectivity rules."
+        deny:
+          conditions:
+            any:
+              - key: "{{ request.operation }}"
+                operator: Equals
+                value: "UPDATE"
+
+    - name: preserve-cache-policy
+      match:
+        resources:
+          kinds: ["NetworkPolicy"]
+          names: ["cache-policy"]
+      validate:
+        message: "The cache NetworkPolicy is intentionally configured this way and cannot be modified."
+        deny:
+          conditions:
+            any:
+              - key: "{{ request.operation }}"
+                operator: Equals
+                value: "UPDATE"
+
     - name: preserve-gateway-config
       match:
         resources:

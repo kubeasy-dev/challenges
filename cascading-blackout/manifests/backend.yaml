@@ -24,15 +24,17 @@ spec:
             - /bin/sh
             - -c
             - |
-              # Simple HTTP server that checks cache connectivity
+              # Cache connectivity check runs independently in background
               while true; do
-                # Try to connect to cache
                 if nc -z -w2 order-cache 6379 2>/dev/null; then
                   echo "[$(date)] ready to accept connections"
                 else
                   echo "[$(date)] ERROR: cannot reach cache at order-cache:6379"
                 fi
-                # Serve HTTP health endpoint
+                sleep 5
+              done &
+              # HTTP server always listening, not gated by cache check timing
+              while true; do
                 echo -e "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nok" | nc -l -p 8080 -w5 || true
               done
           readinessProbe:

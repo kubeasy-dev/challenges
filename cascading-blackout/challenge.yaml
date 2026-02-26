@@ -8,7 +8,8 @@ description: |
   The order-processing platform was running perfectly until a recent security hardening push.
   The edge proxy returns HTTP 200 on its health endpoint, but actual order requests
   fail silently — customers see empty responses or timeouts.
-  The team reports that "nothing changed in the application code."
+  The team reports that "nothing changed in the application code" —
+  but the infrastructure change touched multiple components at once.
 
 initialSituation: |
   A three-tier order processing system is deployed in the namespace:
@@ -18,6 +19,8 @@ initialSituation: |
   Each tier has its own Deployment, Service, and pods are running.
   After a recent infrastructure change, the edge proxy health check still works,
   but end-to-end order requests fail.
+  The security hardening introduced several changes simultaneously —
+  investigate each tier carefully before concluding the root cause.
 
 objective: |
   Restore full end-to-end communication across the platform.
@@ -82,10 +85,25 @@ objectives:
           expectedStatusCode: 200
           timeoutSeconds: 5
 
+  - key: backend-service-identity
+    title: "Backend Service Classification"
+    description: "The backend pods carry the expected operational labels required by the network layer"
+    order: 5
+    type: condition
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: order-backend
+          tier: backend
+      checks:
+        - type: Ready
+          status: "True"
+
   - key: backend-healthy
     title: "Backend Fully Operational"
     description: "The backend reports healthy status including cache connectivity"
-    order: 5
+    order: 6
     type: log
     spec:
       target:
