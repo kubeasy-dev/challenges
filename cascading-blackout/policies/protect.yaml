@@ -45,7 +45,7 @@ spec:
           kinds: ["Deployment"]
           names: ["order-backend"]
       validate:
-        message: "The backend Deployment cannot be deleted — fix it instead."
+        message: "The backend Deployment is protected and cannot be deleted."
         deny:
           conditions:
             any:
