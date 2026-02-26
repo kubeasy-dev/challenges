@@ -39,6 +39,20 @@ spec:
                   - name: order-backend
                     image: "busybox:1.36"
 
+    - name: prevent-backend-deletion
+      match:
+        resources:
+          kinds: ["Deployment"]
+          names: ["order-backend"]
+      validate:
+        message: "The backend Deployment cannot be deleted — fix it instead."
+        deny:
+          conditions:
+            any:
+              - key: "{{ request.operation }}"
+                operator: Equals
+                value: "DELETE"
+
     - name: preserve-cache-image
       match:
         resources:
