@@ -1,0 +1,116 @@
+title: "Cascading Blackout"
+type: "fix"
+theme: "networking"
+difficulty: "hard"
+estimatedTime: 30
+
+description: |
+  The order-processing platform was running perfectly until a recent security hardening push.
+  The edge proxy returns HTTP 200 on its health endpoint, but actual order requests
+  fail silently — customers see empty responses or timeouts.
+  The team reports that "nothing changed in the application code" —
+  but the infrastructure change touched multiple components at once.
+
+initialSituation: |
+  A three-tier order processing system is deployed in the namespace:
+  - An edge proxy (nginx) that routes requests to a backend service
+  - A backend application that processes orders and caches results
+  - A Redis cache used by the backend for session and order data
+  Each tier has its own Deployment, Service, and pods are running.
+  After a recent infrastructure change, the edge proxy health check still works,
+  but end-to-end order requests fail.
+  The security hardening introduced several changes simultaneously —
+  investigate each tier carefully before concluding the root cause.
+
+objective: |
+  Restore full end-to-end communication across the platform.
+  Orders submitted through the edge proxy must reach the backend,
+  and the backend must be able to read and write to the cache.
+  All services should remain healthy and reachable through their Services.
+
+objectives:
+  - key: gateway-running
+    title: "Gateway Online"
+    description: "The edge proxy pods must be running and ready"
+    order: 1
+    type: condition
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: edge-proxy
+      checks:
+        - type: Ready
+          status: "True"
+
+  - key: backend-running
+    title: "Backend Online"
+    description: "The backend pods must be running and ready"
+    order: 2
+    type: condition
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: order-backend
+      checks:
+        - type: Ready
+          status: "True"
+
+  - key: cache-running
+    title: "Cache Online"
+    description: "The cache pods must be running and ready"
+    order: 3
+    type: condition
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: order-cache
+      checks:
+        - type: Ready
+          status: "True"
+
+  - key: gateway-to-backend
+    title: "Gateway Reaches Backend"
+    description: "The edge proxy must be able to forward requests to the backend service"
+    order: 4
+    type: connectivity
+    spec:
+      sourcePod:
+        labelSelector:
+          app: edge-proxy
+      targets:
+        - url: "http://order-backend:8080/health"
+          expectedStatusCode: 200
+          timeoutSeconds: 5
+
+  - key: backend-service-identity
+    title: "Backend Service Classification"
+    description: "The backend pods are correctly classified within the platform"
+    order: 5
+    type: condition
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: order-backend
+          tier: backend
+      checks:
+        - type: Initialized
+          status: "True"
+
+  - key: backend-healthy
+    title: "Backend Fully Operational"
+    description: "The backend reports healthy status including cache connectivity"
+    order: 6
+    type: log
+    spec:
+      target:
+        kind: Pod
+        labelSelector:
+          app: order-backend
+      container: order-backend
+      expectedStrings:
+        - "ready to accept connections"
+      sinceSeconds: 120

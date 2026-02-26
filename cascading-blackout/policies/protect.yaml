@@ -1,0 +1,146 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: protect-cascading-blackout
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: preserve-gateway-image
+      match:
+        resources:
+          namespaces: ["cascading-blackout"]
+          kinds: ["Deployment"]
+          names: ["edge-proxy"]
+      validate:
+        message: "Cannot change the edge proxy image"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: edge-proxy
+                    image: "nginx:1.25-alpine"
+
+    - name: preserve-backend-image
+      match:
+        resources:
+          namespaces: ["cascading-blackout"]
+          kinds: ["Deployment"]
+          names: ["order-backend"]
+      validate:
+        message: "Cannot change the backend application image"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: order-backend
+                    image: "busybox:1.36"
+
+    - name: prevent-backend-deletion
+      match:
+        resources:
+          namespaces: ["cascading-blackout"]
+          kinds: ["Deployment"]
+          names: ["order-backend"]
+      validate:
+        message: "The backend Deployment is protected and cannot be deleted."
+        deny:
+          conditions:
+            any:
+              - key: "{{ request.operation }}"
+                operator: Equals
+                value: "DELETE"
+
+    - name: preserve-cache-image
+      match:
+        resources:
+          namespaces: ["cascading-blackout"]
+          kinds: ["Deployment"]
+          names: ["order-cache"]
+      validate:
+        message: "Cannot change the cache image"
+        pattern:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: redis
+                    image: "redis:7-alpine"
+
+    - name: prevent-netpol-deletion
+      match:
+        resources:
+          namespaces: ["cascading-blackout"]
+          kinds: ["NetworkPolicy"]
+      validate:
+        message: "NetworkPolicies cannot be deleted — they are part of the security requirements. Fix them instead."
+        deny:
+          conditions:
+            any:
+              - key: "{{ request.operation }}"
+                operator: Equals
+                value: "DELETE"
+
+    - name: preserve-gateway-policy
+      match:
+        resources:
+          namespaces: ["cascading-blackout"]
+          kinds: ["NetworkPolicy"]
+          names: ["gateway-policy"]
+      validate:
+        message: "The gateway NetworkPolicy is correctly configured and should not be modified"
+        deny:
+          conditions:
+            any:
+              - key: "{{ request.operation }}"
+                operator: Equals
+                value: "UPDATE"
+
+    - name: preserve-backend-policy
+      match:
+        resources:
+          namespaces: ["cascading-blackout"]
+          kinds: ["NetworkPolicy"]
+          names: ["backend-policy"]
+      validate:
+        message: "The backend NetworkPolicy cannot be modified. You can create additional NetworkPolicy resources to extend its connectivity rules."
+        deny:
+          conditions:
+            any:
+              - key: "{{ request.operation }}"
+                operator: Equals
+                value: "UPDATE"
+
+    - name: preserve-cache-policy
+      match:
+        resources:
+          namespaces: ["cascading-blackout"]
+          kinds: ["NetworkPolicy"]
+          names: ["cache-policy"]
+      validate:
+        message: "The cache NetworkPolicy is intentionally configured this way and cannot be modified."
+        deny:
+          conditions:
+            any:
+              - key: "{{ request.operation }}"
+                operator: Equals
+                value: "UPDATE"
+
+    - name: preserve-gateway-config
+      match:
+        resources:
+          namespaces: ["cascading-blackout"]
+          kinds: ["ConfigMap"]
+          names: ["gateway-config"]
+      validate:
+        message: "Cannot modify the gateway configuration"
+        deny:
+          conditions:
+            any:
+              - key: "{{ request.operation }}"
+                operator: Equals
+                value: "UPDATE"
