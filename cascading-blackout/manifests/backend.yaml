@@ -24,18 +24,24 @@ spec:
             - /bin/sh
             - -c
             - |
-              # Cache connectivity check runs independently in background
+              # Background: check cache and update state flag
               while true; do
                 if nc -z -w2 order-cache 6379 2>/dev/null; then
                   echo "[$(date)] ready to accept connections"
+                  touch /tmp/cache_ok
                 else
                   echo "[$(date)] ERROR: cannot reach cache at order-cache:6379"
+                  rm -f /tmp/cache_ok
                 fi
                 sleep 5
               done &
-              # HTTP server always listening, not gated by cache check timing
+              # Foreground: HTTP server reflects cache state
               while true; do
-                echo -e "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nok" | nc -l -p 8080 -w5 || true
+                if [ -f /tmp/cache_ok ]; then
+                  echo -e "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nok" | nc -l -p 8080 -w5 || true
+                else
+                  echo -e "HTTP/1.1 503 Service Unavailable\r\nContent-Type: text/plain\r\n\r\nunavailable" | nc -l -p 8080 -w5 || true
+                fi
               done
           readinessProbe:
             httpGet:

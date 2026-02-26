@@ -1,8 +1,7 @@
 apiVersion: kyverno.io/v1
-kind: Policy
+kind: ClusterPolicy
 metadata:
   name: protect-cascading-blackout
-  namespace: cascading-blackout
   annotations:
     argocd.argoproj.io/sync-wave: "2"
 spec:
@@ -12,6 +11,7 @@ spec:
     - name: preserve-gateway-image
       match:
         resources:
+          namespaces: ["cascading-blackout"]
           kinds: ["Deployment"]
           names: ["edge-proxy"]
       validate:
@@ -27,6 +27,7 @@ spec:
     - name: preserve-backend-image
       match:
         resources:
+          namespaces: ["cascading-blackout"]
           kinds: ["Deployment"]
           names: ["order-backend"]
       validate:
@@ -42,6 +43,7 @@ spec:
     - name: prevent-backend-deletion
       match:
         resources:
+          namespaces: ["cascading-blackout"]
           kinds: ["Deployment"]
           names: ["order-backend"]
       validate:
@@ -56,6 +58,7 @@ spec:
     - name: preserve-cache-image
       match:
         resources:
+          namespaces: ["cascading-blackout"]
           kinds: ["Deployment"]
           names: ["order-cache"]
       validate:
@@ -71,6 +74,7 @@ spec:
     - name: prevent-netpol-deletion
       match:
         resources:
+          namespaces: ["cascading-blackout"]
           kinds: ["NetworkPolicy"]
       validate:
         message: "NetworkPolicies cannot be deleted — they are part of the security requirements. Fix them instead."
@@ -84,6 +88,7 @@ spec:
     - name: preserve-gateway-policy
       match:
         resources:
+          namespaces: ["cascading-blackout"]
           kinds: ["NetworkPolicy"]
           names: ["gateway-policy"]
       validate:
@@ -98,6 +103,7 @@ spec:
     - name: preserve-backend-policy
       match:
         resources:
+          namespaces: ["cascading-blackout"]
           kinds: ["NetworkPolicy"]
           names: ["backend-policy"]
       validate:
@@ -112,6 +118,7 @@ spec:
     - name: preserve-cache-policy
       match:
         resources:
+          namespaces: ["cascading-blackout"]
           kinds: ["NetworkPolicy"]
           names: ["cache-policy"]
       validate:
@@ -126,6 +133,7 @@ spec:
     - name: preserve-gateway-config
       match:
         resources:
+          namespaces: ["cascading-blackout"]
           kinds: ["ConfigMap"]
           names: ["gateway-config"]
       validate:

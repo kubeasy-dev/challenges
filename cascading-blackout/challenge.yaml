@@ -87,7 +87,7 @@ objectives:
 
   - key: backend-service-identity
     title: "Backend Service Classification"
-    description: "The backend pods carry the expected operational labels required by the network layer"
+    description: "The backend pods are correctly classified within the platform"
     order: 5
     type: condition
     spec:
@@ -97,7 +97,7 @@ objectives:
           app: order-backend
           tier: backend
       checks:
-        - type: Ready
+        - type: Initialized
           status: "True"
 
   - key: backend-healthy
